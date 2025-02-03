@@ -24,7 +24,6 @@ const schemas = {
         },
         nid: {
             type: String,
-            required: [true, 'NID is required'],
             unique: true,
             match: [/^\d{10,17}$/, 'NID must be between 10 and 17 digits'],
             minlength: [10, 'NID must be at least 10 digits'],
@@ -32,7 +31,6 @@ const schemas = {
         },
         phone: {
             type: String,
-            required: [true, 'Phone number is required'],
             unique: true,
             match: [
                 /^\+?(88)?01[3-9]\d{8}$/,

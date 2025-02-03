@@ -1,4 +1,4 @@
-const httpMethodsConstants = Object.freeze({
+const httpMethods = Object.freeze({
     OPTIONS: 'OPTIONS',
     POST: 'POST',
     GET: 'GET',
@@ -6,4 +6,4 @@ const httpMethodsConstants = Object.freeze({
     DELETE: 'DELETE',
 });
 
-export default httpMethodsConstants;
+export default httpMethods;

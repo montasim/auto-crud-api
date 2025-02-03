@@ -1,21 +1,23 @@
 import httpStatus from 'http-status-lite';
 
+import httpMethods from '../constants/httpMethods.js';
+
 import sendResponse from './sendResponse.js';
 
 const validate = (schemas) => (req, res, next) => {
     let schema;
 
     switch (req.method) {
-        case 'POST':
+        case httpMethods.POST:
             schema = schemas.create;
             break;
-        case 'PUT':
+        case httpMethods.PUT:
             schema = schemas.update;
             break;
-        case 'GET':
+        case httpMethods.GET:
             schema = schemas.read;
             break;
-        case 'DELETE':
+        case httpMethods.DELETE:
             schema = schemas.delete;
             break;
         default:
@@ -26,11 +28,13 @@ const validate = (schemas) => (req, res, next) => {
 
     if (!result.success) {
         return sendResponse(
+            req,
             res,
             {},
             httpStatus.BAD_REQUEST,
             false,
             'Validation failed',
+            {},
             {},
             result.error.errors.map((e) => ({
                 field: e.path.join('.'),

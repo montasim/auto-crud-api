@@ -3,13 +3,16 @@ import app from './src/app.js';
 import configuration from './src/configuration/configuration.js';
 import logger from './src/lib/logger.js';
 
+import toSentenceCase from './src/utils/toSentenceCase.js';
+
 const startServer = async () => {
     try {
         await mongodb.connect();
 
-        return app.listen(configuration.port, () => {
+        const port = configuration.port;
+        return app.listen(port, () => {
             logger.info(
-                `${configuration.env} server started on port ${configuration.port}`
+                `${toSentenceCase(configuration.env)} server started on port ${port}`
             );
         });
     } catch (error) {

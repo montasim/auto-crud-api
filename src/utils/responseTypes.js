@@ -2,20 +2,70 @@ import httpStatus from 'http-status-lite';
 
 import sendResponse from './sendResponse.js';
 
-const CREATED = (res, headers = {}, message, data = {}) =>
-    sendResponse(res, headers, httpStatus.CREATED, true, message, data);
+const CREATED = (req, res, headers = {}, message, data = {}) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.CREATED,
+        true,
+        message,
+        data,
+        {},
+        {}
+    );
 
-const OK = (res, headers = {}, message, data = {}) =>
-    sendResponse(res, headers, httpStatus.OK, true, message, data);
+const OK = (req, res, headers = {}, message, data = {}, pagination = {}) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.OK,
+        true,
+        message,
+        data,
+        pagination,
+        {}
+    );
 
-const NOT_FOUND = (res, headers = {}, message) =>
-    sendResponse(res, headers, httpStatus.NOT_FOUND, false, message, {});
+const NOT_FOUND = (req, res, headers = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.NOT_FOUND,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
 
-const CONFLICT = (res, headers = {}, message) =>
-    sendResponse(res, headers, httpStatus.CONFLICT, false, message, {});
+const CONFLICT = (req, res, headers = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.CONFLICT,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
 
-const BAD_REQUEST = (res, headers = {}, message) =>
-    sendResponse(res, headers, httpStatus.BAD_REQUEST, false, message, {});
+const BAD_REQUEST = (req, res, headers = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.BAD_REQUEST,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
 
 const sharedResponseTypes = {
     CREATED,

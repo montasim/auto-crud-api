@@ -83,8 +83,8 @@ const blockedUserAgents = [
     'probe',
 ];
 
-const middlewareConstants = {
+const middleware = {
     blockedUserAgents,
 };
 
-export default middlewareConstants;
+export default middleware;

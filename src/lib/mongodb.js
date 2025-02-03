@@ -5,48 +5,56 @@ import configuration from '../configuration/configuration.js';
 
 // Function to handle reconnection logic
 const handleReconnection = async () => {
-    logger.warn('DATABASE DISCONNECTED! ATTEMPTING TO RECONNECT');
+    logger.warn(
+        'Warning: Database connection lost. Attempting to reconnect...'
+    );
     try {
         await mongoose.connect(configuration.mongoUri);
-        logger.info('DATABASE RECONNECTED');
+        logger.info('Info: Database reconnected successfully.');
     } catch (error) {
-        logger.error(`RECONNECTION FAILED: ${error.message}`);
+        logger.error(
+            `Error: Database reconnection failed. Reason: ${error.message}`
+        );
     }
 };
 
 // Function to connect to the database
 const connect = async () => {
-    // Set up event listeners for MongoDB
+    // Set up event listeners for MongoDB events.
     mongoose.connection.once('error', (error) => {
-        logger.error(`DATABASE ERROR: ${error.message}`);
+        logger.error(
+            `Error: Database connection error encountered. Reason: ${error.message}`
+        );
     });
 
     mongoose.connection.once('disconnecting', () => {
-        logger.info('DATABASE DISCONNECTING');
+        logger.info('Info: Database is disconnecting...');
     });
 
     mongoose.connection.once('disconnected', handleReconnection);
 
     mongoose.connection.once('reconnected', () => {
-        logger.info('DATABASE RECONNECTED SUCCESSFULLY');
+        logger.info('Info: Database reconnected successfully.');
     });
 
-    // Attempt to connect to the database
+    // Attempt to connect to the database.
     try {
         if (mongoose.connection.readyState === 1) {
             // @ts-ignore
             logger.info(
-                `DATABASE ALREADY CONNECTED TO: ${mongoose.connection.db.databaseName}`
+                `Info: Already connected to database: ${mongoose.connection.db.databaseName}`
             );
         } else {
             await mongoose.connect(configuration.mongoUri);
             // @ts-ignore
             logger.info(
-                `DATABASE CONNECTED SUCCESSFULLY TO: '${mongoose.connection.db.databaseName}'`
+                `Info: Database connected successfully to: ${mongoose.connection.db.databaseName}`
             );
         }
     } catch (error) {
-        logger.error(`INITIAL CONNECTION FAILED: ${error.message}`);
+        logger.error(
+            `Error: Initial database connection failed. Reason: ${error.message}`
+        );
         throw error;
     }
 };
@@ -54,20 +62,23 @@ const connect = async () => {
 // Function to disconnect from the database
 const disconnect = async () => {
     try {
-        logger.info('DISCONNECTING DATABASE');
+        logger.info('Info: Disconnecting from the database...');
         await mongoose.disconnect();
-        logger.info('DATABASE DISCONNECTED');
+        logger.info('Info: Database disconnected successfully.');
     } catch (error) {
-        logger.error(`DISCONNECTION ERROR: ${error.message}`);
+        logger.error(
+            `Error: Database disconnection failed. Reason: ${error.message}`
+        );
         throw error;
     }
 };
 
+// Function to start a new session.
 const startSession = async () => {
     return mongoose.startSession();
 };
 
-// Export the DatabaseService with connect and disconnect methods
+// Export the MongoDB service with connect, disconnect, and startSession methods.
 const mongodb = {
     connect,
     disconnect,

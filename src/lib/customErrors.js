@@ -45,10 +45,18 @@ class InvalidObjectIdError extends AppError {
     }
 }
 
+class CriticalError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'CriticalError';
+    }
+}
+
 export {
     AppError,
     ZodValidationError,
     MongooseValidationError,
     DuplicateKeyError,
     InvalidObjectIdError,
+    CriticalError,
 };

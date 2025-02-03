@@ -33,6 +33,18 @@ const createZodSchemas = (name, schemaDefinition) => {
                     message: value.match[1],
                 });
             }
+
+            if (value.minlength) {
+                schema = schema.min(value.minlength[0], {
+                    message: value.minlength[1],
+                });
+            }
+
+            if (value.maxlength) {
+                schema = schema.max(value.maxlength[0], {
+                    message: value.maxlength[1],
+                });
+            }
         } else if (value.type === Number) {
             schema = z.number({
                 required_error: value.required
@@ -64,9 +76,11 @@ const createZodSchemas = (name, schemaDefinition) => {
                 required_error: `${key} of ${name} must be an array of strings`,
             });
         } else if (value.type === mongoose.Schema.Types.ObjectId) {
-            schema = z.string().regex(/^[a-fA-F0-9]{24}$/, {
-                message: `${key} of ${name} must be a valid MongoDB ObjectId`,
-            });
+            schema = z
+                .string()
+                .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+                    message: `${key} of ${name} must be a valid MongoDB ObjectId`,
+                });
         } else {
             schema = z.any();
         }

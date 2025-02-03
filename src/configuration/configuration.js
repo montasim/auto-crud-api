@@ -1,11 +1,10 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
+import getEnvironmentValue from '../utils/getEnvironmentValue.js';
+import getIntValue from '../utils/getIntValue.js';
 
 const configuration = {
-    env: process.env.NODE_ENV,
-    port: process.env.PORT,
-    mongoUri: process.env.MONGO_URI,
+    env: getEnvironmentValue('NODE_ENV'),
+    port: getIntValue(getEnvironmentValue('PORT')),
+    mongoUri: getEnvironmentValue('MONGO_URI'),
 };
 
 export default configuration;

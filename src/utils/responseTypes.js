@@ -14,11 +14,15 @@ const NOT_FOUND = (res, headers = {}, message) =>
 const CONFLICT = (res, headers = {}, message) =>
     sendResponse(res, headers, httpStatus.CONFLICT, false, message, {});
 
+const BAD_REQUEST = (res, headers = {}, message) =>
+    sendResponse(res, headers, httpStatus.BAD_REQUEST, false, message, {});
+
 const sharedResponseTypes = {
     CREATED,
     OK,
     NOT_FOUND,
     CONFLICT,
+    BAD_REQUEST,
 };
 
 export default sharedResponseTypes;

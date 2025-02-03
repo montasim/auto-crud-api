@@ -1,6 +1,7 @@
 import express from 'express';
 
 import logger from '../lib/logger.js';
+import schema from '../lib/schema.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 import asyncHandler from '../utils/asyncHandler.js';
@@ -15,6 +16,13 @@ const createCrudRoutes = (model, zodSchema) => {
     const uniqueFields = Object.entries(model.schema.paths)
         .filter(([_, value]) => value.options.unique)
         .map(([key]) => key);
+
+    // Get schema reference fields dynamically
+    const refFields = Object.entries(model.schema.paths)
+        .filter(
+            ([_, value]) => value.instance === 'ObjectId' && value.options.ref
+        )
+        .map(([key, value]) => key);
 
     const createDocument = async (req, res) => {
         // Check for existing unique fields
@@ -38,8 +46,12 @@ const createCrudRoutes = (model, zodSchema) => {
         }
 
         // Create new document
-        const doc = await model.create(req.body);
-        const successMessage = `New ${model.modelName} created with ID: "${doc._id}"`;
+        let doc = await model.create(req.body);
+
+        // Populate referenced fields
+        doc = await model.findById(doc._id).populate(refFields);
+
+        const successMessage = `New ${sentenceCaseModelName} created with ID: "${doc._id}"`;
 
         logger.info(successMessage);
 
@@ -48,12 +60,15 @@ const createCrudRoutes = (model, zodSchema) => {
 
     const getDocumentsList = async (req, res) => {
         const { page = 1, limit = 10, sort = '-createdAt' } = req.query;
+
         const docs = await model
             .find({})
+            .populate(refFields) // Populate referenced fields dynamically
             .sort(sort)
             .skip((page - 1) * limit)
             .limit(Number(limit));
-        const successMessage = `${sentenceCaseModelName} fetched`;
+
+        const successMessage = `${sentenceCaseModelName} fetched with populated references`;
 
         logger.info(successMessage);
 
@@ -62,16 +77,17 @@ const createCrudRoutes = (model, zodSchema) => {
 
     const getADocument = async (req, res) => {
         const docId = req.params.id;
-        const doc = await model.findById(docId);
+
+        const doc = await model.findById(docId).populate(refFields);
 
         if (!doc)
-            sharedResponseTypes.NOT_FOUND(
+            return sharedResponseTypes.NOT_FOUND(
                 res,
                 {},
                 `${sentenceCaseModelName} with ID: "${docId}" not found`
             );
 
-        const successMessage = `${sentenceCaseModelName} with ID: "${docId}" fetched`;
+        const successMessage = `${sentenceCaseModelName} with ID: "${docId}" fetched with populated references`;
 
         logger.info(successMessage);
 
@@ -98,7 +114,7 @@ const createCrudRoutes = (model, zodSchema) => {
         }
 
         // Update document
-        const updatedDoc = await model.findByIdAndUpdate(docId, req.body, {
+        let updatedDoc = await model.findByIdAndUpdate(docId, req.body, {
             new: true,
         });
 
@@ -108,6 +124,9 @@ const createCrudRoutes = (model, zodSchema) => {
                 {},
                 `${sentenceCaseModelName} with ID: "${docId}" not found`
             );
+
+        // Populate referenced fields
+        updatedDoc = await model.findById(docId).populate(refFields);
 
         const successMessage = `${sentenceCaseModelName} updated with ID: "${docId}"`;
 
@@ -128,6 +147,40 @@ const createCrudRoutes = (model, zodSchema) => {
             );
 
         const successMessage = `${sentenceCaseModelName} with ID: ${docId} deleted successfully`;
+
+        logger.info(successMessage);
+
+        return sharedResponseTypes.OK(res, {}, successMessage);
+    };
+
+    const deleteDocumentList = async (req, res) => {
+        // Validate the request using Zod
+        const validationResult = schema.idsSchema.safeParse(req.query);
+        if (!validationResult.success) {
+            return sharedResponseTypes.BAD_REQUEST(
+                res,
+                {},
+                validationResult.error.errors[0].message
+            );
+        }
+
+        const docIds = req.query.ids.split(',');
+
+        // Check if all documents exist
+        const existingDocs = await model.find({ _id: { $in: docIds } });
+
+        if (existingDocs.length !== docIds.length) {
+            return sharedResponseTypes.NOT_FOUND(
+                res,
+                {},
+                `Some ${sentenceCaseModelName} IDs do not exist. Deletion aborted.`
+            );
+        }
+
+        // If all exist, delete them
+        await model.deleteMany({ _id: { $in: docIds } });
+
+        const successMessage = `${sentenceCaseModelName} with IDs: ${docIds.join(', ')} deleted successfully`;
 
         logger.info(successMessage);
 
@@ -177,6 +230,29 @@ const createCrudRoutes = (model, zodSchema) => {
         '/destroy/:id',
         validate(zodSchema),
         asyncHandler(deleteADocument)
+    );
+
+    // Delete List
+    router.delete('/', validate(zodSchema), asyncHandler(deleteDocumentList));
+    router.delete(
+        '/delete-list',
+        validate(zodSchema),
+        asyncHandler(deleteDocumentList)
+    );
+    router.delete(
+        '/delete-by-list',
+        validate(zodSchema),
+        asyncHandler(deleteDocumentList)
+    );
+    router.delete(
+        '/destroy-list',
+        validate(zodSchema),
+        asyncHandler(deleteDocumentList)
+    );
+    router.delete(
+        '/destroy-by-list',
+        validate(zodSchema),
+        asyncHandler(deleteDocumentList)
     );
 
     return router;

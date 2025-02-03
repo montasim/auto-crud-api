@@ -1,106 +1,69 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
+import schema from '../lib/schema.js';
+
+const { isValidObjectId, idSchema } = schema;
+
 const createZodSchemas = (name, schemaDefinition) => {
     const createSchema = {};
     const updateSchema = {};
-    const readSchema = {
-        id: z
-            .string()
-            .refine((val) => mongoose.Types.ObjectId.isValid(val), {
-                message: 'ID must be a valid MongoDB ObjectId',
-            })
-            .optional(),
-    };
-    const deleteSchema = {
-        id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-            message: 'ID must be a valid MongoDB ObjectId',
-        }),
-    };
 
     for (const [key, value] of Object.entries(schemaDefinition)) {
         let schema;
 
-        if (value.type === String) {
-            schema = z.string({
-                required_error: value.required
-                    ? value.required[1]
-                    : `${key} of ${name} must be a string`,
-            });
-
-            if (value.match) {
-                schema = schema.regex(value.match[0], {
-                    message: value.match[1],
-                });
-            }
-
-            if (value.minlength) {
-                schema = schema.min(value.minlength[0], {
-                    message: value.minlength[1],
-                });
-            }
-
-            if (value.maxlength) {
-                schema = schema.max(value.maxlength[0], {
-                    message: value.maxlength[1],
-                });
-            }
-        } else if (value.type === Number) {
-            schema = z.number({
-                required_error: value.required
-                    ? value.required[1]
-                    : `${key} of ${name} must be a number`,
-            });
-
-            if (value.min) {
-                schema = schema.min(value.min[0], { message: value.min[1] });
-            }
-
-            if (value.max) {
-                schema = schema.max(value.max[0], { message: value.max[1] });
-            }
-        } else if (value.type === Boolean) {
-            schema = z.boolean({
-                required_error: value.required
-                    ? value.required[1]
-                    : `${key} of ${name} must be a boolean`,
-            });
-        } else if (value.type === Date) {
-            schema = z.date({
-                required_error: value.required
-                    ? value.required[1]
-                    : `${key} of ${name} must be a valid date`,
-            });
-        } else if (Array.isArray(value.type)) {
-            schema = z.array(z.string(), {
-                required_error: `${key} of ${name} must be an array of strings`,
-            });
-        } else if (value.type === mongoose.Schema.Types.ObjectId) {
-            schema = z
+        // Define common data type mappings
+        const typeMap = {
+            [String]: z.string(),
+            [Number]: z.number(),
+            [Boolean]: z.boolean(),
+            [Date]: z.date(),
+            [mongoose.Schema.Types.ObjectId]: z
                 .string()
-                .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+                .refine(isValidObjectId, {
                     message: `${key} of ${name} must be a valid MongoDB ObjectId`,
-                });
-        } else {
-            schema = z.any();
+                }),
+        };
+
+        // Assign base schema type
+        schema = typeMap[value.type] || z.any();
+
+        // Apply additional validations
+        if (value.match)
+            schema = schema.regex(value.match[0], { message: value.match[1] });
+        if (value.minlength)
+            schema = schema.min(value.minlength[0], {
+                message: value.minlength[1],
+            });
+        if (value.maxlength)
+            schema = schema.max(value.maxlength[0], {
+                message: value.maxlength[1],
+            });
+        if (value.min)
+            schema = schema.min(value.min[0], { message: value.min[1] });
+        if (value.max)
+            schema = schema.max(value.max[0], { message: value.max[1] });
+
+        // Handle arrays separately
+        if (Array.isArray(value.type)) {
+            schema = z.array(z.string()).nonempty({
+                message: `${key} of ${name} must be a non-empty array`,
+            });
         }
 
-        // Apply validation based on method:
-        if (value.required && value.required[0]) {
-            createSchema[key] = schema; // Required in Create
-        } else {
-            createSchema[key] = schema.optional(); // Optional in Create
-        }
-
-        updateSchema[key] = schema.optional(); // Optional in Update
-        readSchema[key] = schema.optional(); // Optional in Read
+        // Assign schemas based on method
+        createSchema[key] = value.required?.[0] ? schema : schema.optional();
+        updateSchema[key] = schema.optional();
     }
 
     return {
         create: z.object(createSchema).strict(),
         update: z.object(updateSchema).strict(),
-        read: z.object(readSchema).strict(),
-        delete: z.object(deleteSchema).strict(),
+        read: z
+            .object({ idSchema, ...updateSchema })
+            .strict()
+            .partial(),
+        delete: z.object({ idSchema }).strict().partial(),
     };
 };
 

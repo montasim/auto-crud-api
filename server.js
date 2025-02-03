@@ -1,7 +1,7 @@
 import mongodb from './src/lib/mongodb.js';
 import app from './src/app.js';
-import logger from './src/lib/logger.js';
 import configuration from './src/configuration/configuration.js';
+import logger from './src/lib/logger.js';
 
 const startServer = async () => {
     try {

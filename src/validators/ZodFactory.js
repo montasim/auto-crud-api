@@ -4,10 +4,17 @@ import mongoose from 'mongoose';
 const createZodSchemas = (name, schemaDefinition) => {
     const createSchema = {};
     const updateSchema = {};
-    const readSchema = {};
+    const readSchema = {
+        id: z
+            .string()
+            .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+                message: 'ID must be a valid MongoDB ObjectId',
+            })
+            .optional(),
+    };
     const deleteSchema = {
-        id: z.string().regex(/^[a-fA-F0-9]{24}$/, {
-            message: `${name} ID must be a valid MongoDB ObjectId`,
+        id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            message: 'ID must be a valid MongoDB ObjectId',
         }),
     };
 
@@ -20,12 +27,26 @@ const createZodSchemas = (name, schemaDefinition) => {
                     ? value.required[1]
                     : `${key} of ${name} must be a string`,
             });
+
+            if (value.match) {
+                schema = schema.regex(value.match[0], {
+                    message: value.match[1],
+                });
+            }
         } else if (value.type === Number) {
             schema = z.number({
                 required_error: value.required
                     ? value.required[1]
                     : `${key} of ${name} must be a number`,
             });
+
+            if (value.min) {
+                schema = schema.min(value.min[0], { message: value.min[1] });
+            }
+
+            if (value.max) {
+                schema = schema.max(value.max[0], { message: value.max[1] });
+            }
         } else if (value.type === Boolean) {
             schema = z.boolean({
                 required_error: value.required

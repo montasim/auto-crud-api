@@ -5,6 +5,13 @@ import mongoose from 'mongoose';
 import logger from '../lib/logger.js';
 
 import sendResponse from './sendResponse.js';
+import {
+    AppError,
+    ZodValidationError,
+    MongooseValidationError,
+    DuplicateKeyError,
+    InvalidObjectIdError,
+} from '../lib/customErrors.js';
 
 const asyncHandler = (fn) => {
     return async (req, res, next) => {
@@ -22,10 +29,7 @@ const asyncHandler = (fn) => {
                     false,
                     'Validation failed',
                     {},
-                    error.errors.map((e) => ({
-                        field: e.path.join('.'),
-                        message: e.message,
-                    }))
+                    new ZodValidationError(error.errors).details
                 );
             }
 
@@ -38,10 +42,7 @@ const asyncHandler = (fn) => {
                     false,
                     'Database validation failed',
                     {},
-                    Object.values(error.errors).map((e) => ({
-                        field: e.path,
-                        message: e.message,
-                    }))
+                    new MongooseValidationError(error.errors).details
                 );
             }
 
@@ -55,22 +56,36 @@ const asyncHandler = (fn) => {
                     false,
                     `Duplicate value error: ${field} already exists`,
                     {},
-                    { field, value: error.keyValue[field] }
+                    new DuplicateKeyError(field, error.keyValue[field]).details
                 );
             }
 
-            // Handle Other Mongoose Errors (e.g., CastError for invalid ObjectId)
+            // Handle Mongoose Cast Errors (Invalid ObjectId)
             if (error instanceof mongoose.Error.CastError) {
                 return sendResponse(
                     res,
                     {},
                     httpStatus.BAD_REQUEST,
                     false,
-                    `Invalid ${error.path}: ${error.value}`
+                    `Invalid ${error.path}: ${error.value}`,
+                    {},
+                    new InvalidObjectIdError(error.path, error.value).details
                 );
             }
 
             // Handle General Errors
+            if (error instanceof AppError) {
+                return sendResponse(
+                    res,
+                    {},
+                    error.statusCode,
+                    false,
+                    error.message,
+                    {},
+                    error.details
+                );
+            }
+
             return sendResponse(
                 res,
                 {},

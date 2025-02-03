@@ -1,5 +1,7 @@
 import httpStatus from 'http-status-lite';
 
+import sendResponse from './sendResponse.js';
+
 const validate = (schemas) => (req, res, next) => {
     let schema;
 
@@ -20,16 +22,21 @@ const validate = (schemas) => (req, res, next) => {
             return next(); // No validation needed
     }
 
-    const result = schema.safeParse(req.body);
+    const result = schema.safeParse({ ...req.body, ...req.params });
 
     if (!result.success) {
-        return res.status(httpStatus.BAD_REQUEST).json({
-            message: 'Validation failed',
-            errors: result.error.errors.map((e) => ({
+        return sendResponse(
+            res,
+            {},
+            httpStatus.BAD_REQUEST,
+            false,
+            'Validation failed',
+            {},
+            result.error.errors.map((e) => ({
                 field: e.path.join('.'),
                 message: e.message,
-            })),
-        });
+            }))
+        );
     }
 
     next();

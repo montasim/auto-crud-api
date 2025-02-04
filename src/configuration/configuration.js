@@ -2,6 +2,7 @@ import { z } from 'zod';
 import dotenv from 'dotenv';
 
 import environments from '../constants/environments.js';
+import httpMethods from '../constants/httpMethods.js';
 
 import { CriticalError } from '../lib/customErrors.js';
 
@@ -37,15 +38,42 @@ const envSchema = z.object({
             })
     ),
 
-    // MONGO_URI must be provided and follow the basic MongoDB URI pattern.
-    MONGO_URI: z
+    // DATABASE_MONGODB_CONNECTION_URI must be provided and follow the basic MongoDB URI pattern.
+    DATABASE_MONGODB_CONNECTION_URI: z
         .string({
-            required_error: 'The MONGO_URI environment variable is required.',
+            required_error:
+                'The DATABASE_MONGODB_CONNECTION_URI environment variable is required.',
         })
         .refine((val) => /^mongodb(?:\+srv)?:\/\/.+/i.test(val), {
             message:
-                'The MONGO_URI environment variable must be a valid MongoDB URI, starting with "mongodb://" or "mongodb+srv://".',
+                'The DATABASE_MONGODB_CONNECTION_URI environment variable must be a valid MongoDB URI, starting with "mongodb://" or "mongodb+srv://".',
         }),
+
+    // CORS_ALLOWED_METHODS must be one of the allowed values
+    CORS_ALLOWED_METHODS: z.enum(httpMethods, {
+        required_error:
+            'The CORS_ALLOWED_METHODS environment variable is required.',
+        invalid_type_error: `CORS_ALLOWED_METHODS must be one of: ${httpMethods.join(', ')}.`,
+    }),
+
+    // CORS_ALLOWED_ORIGIN must be a valid URL (not a comma-separated list)
+    CORS_ALLOWED_ORIGIN: z
+        .string()
+        .url({
+            message: 'CORS_ALLOWED_ORIGIN must be a valid URL.',
+        })
+        .refine((val) => allowedOrigins.includes(val), {
+            message: `CORS_ALLOWED_ORIGIN must be one of: ${allowedOrigins.join(', ')}.`,
+        })
+        .optional(), // Marked as optional if you want it to be allowed to be empty
+
+    // CORS_ALLOWED_HEADERS must be a valid string and one of the allowed values
+    CORS_ALLOWED_HEADERS: z
+        .string()
+        .refine((val) => allowedHeaders.includes(val), {
+            message: `CORS_ALLOWED_HEADERS must be one of: ${allowedHeaders.join(', ')}.`,
+        })
+        .optional(), // Marked as optional if you want it to be allowed to be empty
 });
 
 // Validate the environment variables.
@@ -69,8 +97,20 @@ try {
 // Build the configuration object.
 const configuration = {
     env: envVars.NODE_ENV,
+
     port: envVars.PORT,
-    mongoUri: envVars.MONGO_URI,
+
+    database: {
+        mongodb: {
+            connectionUri: envVars.DATABASE_MONGODB_CONNECTION_URI,
+        },
+    },
+
+    cors: {
+        allowedMethods: envVars.CORS_ALLOWED_METHODS,
+        allowedOrigin: envVars.CORS_ALLOWED_ORIGIN,
+        allowedHeaders: envVars.CORS_ALLOWED_HEADERS,
+    },
 };
 
 export default configuration;

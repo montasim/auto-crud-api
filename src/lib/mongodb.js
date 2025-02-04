@@ -3,13 +3,15 @@ import mongoose from 'mongoose';
 import logger from './logger.js';
 import configuration from '../configuration/configuration.js';
 
+const mongodbConnectionUri = configuration.database.mongodb.connectionUri;
+
 // Function to handle reconnection logic
 const handleReconnection = async () => {
     logger.warn(
         'Warning: Database connection lost. Attempting to reconnect...'
     );
     try {
-        await mongoose.connect(configuration.mongoUri);
+        await mongoose.connect(mongodbConnectionUri);
         logger.info('Info: Database reconnected successfully.');
     } catch (error) {
         logger.error(
@@ -45,7 +47,7 @@ const connect = async () => {
                 `Info: Already connected to database: ${mongoose.connection.db.databaseName}`
             );
         } else {
-            await mongoose.connect(configuration.mongoUri);
+            await mongoose.connect(mongodbConnectionUri);
             // @ts-ignore
             logger.info(
                 `Info: Database connected successfully to: ${mongoose.connection.db.databaseName}`

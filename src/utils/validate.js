@@ -27,19 +27,21 @@ const validate = (schemas) => (req, res, next) => {
     const result = schema.safeParse({ ...req.body, ...req.params });
 
     if (!result.success) {
+        const errors = result?.error?.errors?.map((e) => ({
+            field: e.path ? e.path.join('.') : 'unknown',
+            message: e?.message,
+        }));
+
         return sendResponse(
             req,
             res,
             {},
             httpStatus.BAD_REQUEST,
             false,
-            'Validation failed',
+            'Data validation failed',
             {},
             {},
-            result.error.errors.map((e) => ({
-                field: e.path.join('.'),
-                message: e.message,
-            }))
+            errors
         );
     }
 

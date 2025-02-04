@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import environments from '../constants/environments.js';
 import httpMethods from '../constants/httpMethods.js';
+import logger from '../lib/logger.js';
 
 import { EnvironmentVariableError } from '../lib/customErrors.js';
 
@@ -15,6 +16,20 @@ const checkUrlExists = async (url) => {
         await axios.get(url); // Perform a GET request to the URL
         return true; // If successful, return true
     } catch (error) {
+        let errorMessage = `URL Check Failed: Unable to reach ${url}. `;
+
+        if (error.response) {
+            // Server responded with a status code outside of 2xx
+            errorMessage += `Received status code ${error.response.status}.`;
+        } else if (error.request) {
+            // Request was made, but no response received
+            errorMessage += 'No response received from the server.';
+        } else {
+            // Something went wrong setting up the request
+            errorMessage += `Request setup error: ${error.message}`;
+        }
+
+        logger.error(errorMessage, { url, error: error.toString() });
         return false; // If there's an error, return false (URL is not reachable)
     }
 };

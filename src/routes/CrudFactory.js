@@ -19,12 +19,12 @@ const createCrudRoutes = (model, zodSchema) => {
 
     // Extract unique fields and reference fields.
     const uniqueFields = Object.entries(model.schema.paths)
-        .filter(([_, field]) => field.options.unique)
+        .filter(([, field]) => field.options.unique)
         .map(([key]) => key);
 
     const referenceFields = Object.entries(model.schema.paths)
         .filter(
-            ([_, field]) => field.instance === 'ObjectId' && field.options.ref
+            ([, field]) => field.instance === 'ObjectId' && field.options.ref
         )
         .map(([key]) => key);
 

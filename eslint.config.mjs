@@ -37,6 +37,9 @@ export default [
                 process: 'readonly',
                 module: 'readonly',
                 require: 'readonly',
+
+                // Adds
+                URL: 'readonly',
             },
         },
     },

@@ -2,7 +2,7 @@
 
 <!-- repository summary badges start -->
 <div>
-    <img alt="Wakatime coding time badge" src="https://wakatime.com/badge/user/bb224c90-7cb7-4c45-953e-a9e26c1cb06c/project/eeb4680f-6d81-4c44-a940-6d9a600a3227.svg?labelColor=EB008B&color=00B8B5">
+    <img alt="Wakatime coding time badge" src="https://wakatime.com/badge/user/bb224c90-7cb7-4c45-953e-a9e26c1cb06c/project/80c8cc35-4f13-44d4-af93-059830f95de8.svg?labelColor=EB008B&color=00B8B5">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">
     <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">
     <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">

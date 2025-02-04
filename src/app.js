@@ -18,6 +18,7 @@ import morganConfiguration from './configuration/morgan.js';
 import sanitizeRequestConfiguration from './configuration/sanitizeRequest.js';
 import swaggerConfiguration from './configuration/swagger.js';
 
+import cspViolationReport from './service/cspViolationReport.js';
 import createMongooseModel from './models/SchemaFactory.js';
 import createZodSchema from './validators/ZodFactory.js';
 import createCrudRoutes from './routes/CrudFactory.js';
@@ -39,6 +40,13 @@ app.use(express.urlencoded({ limit: '20mb', extended: true })); // Parse URL enc
 
 // Sanitize request data (after body parsing for security)
 app.use(sanitizeRequestConfiguration);
+
+// CSP Violation Logging Endpoint
+app.post(
+    '/report/csp-violation',
+    express.json(),
+    async (req, res) => await cspViolationReport(req, res)
+);
 
 // Routes and Swagger documentation setup
 const swaggerDocs = swaggerJsdoc(swaggerConfiguration);

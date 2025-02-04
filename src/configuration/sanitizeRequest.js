@@ -2,6 +2,7 @@
 
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
+import httpStatus from 'http-status-lite';
 
 import logger from '../lib/logger.js';
 
@@ -9,10 +10,13 @@ import logger from '../lib/logger.js';
 const { window } = new JSDOM('');
 const dompurify = DOMPurify(window);
 
+/**
+ * Recursively sanitizes an object using strict DOMPurify configurations.
+ * @param {Object} obj - The object to sanitize.
+ */
 const sanitize = (obj) => {
-    const seen = new WeakSet(); // Avoid circular reference issues
+    const seen = new WeakSet(); // Prevent circular reference issues
 
-    // Recursively sanitize objects and arrays
     const recurSanitize = (object) => {
         if (seen.has(object)) {
             return;
@@ -21,10 +25,22 @@ const sanitize = (obj) => {
 
         Object.keys(object).forEach((key) => {
             const value = object[key];
+
             if (typeof value === 'string') {
-                object[key] = dompurify.sanitize(value);
+                const sanitizedValue = dompurify.sanitize(value, {
+                    USE_PROFILES: { html: true }, // Strict sanitization
+                    ALLOWED_TAGS: [], // Allow NO tags (strips all HTML)
+                    ALLOWED_ATTR: [], // Allow NO attributes (removes inline event handlers)
+                });
+
+                if (value !== sanitizedValue) {
+                    logger.warn(
+                        `⚠️ Strict Sanitization Applied: Key '${key}' was modified due to potential XSS.`
+                    );
+                }
+
+                object[key] = sanitizedValue; // Replace with sanitized version
             } else if (value && typeof value === 'object') {
-                // Check for non-null objects
                 recurSanitize(value);
             }
         });
@@ -33,19 +49,27 @@ const sanitize = (obj) => {
     recurSanitize(obj);
 };
 
+/**
+ * Middleware to sanitize incoming request data (body, query, params).
+ */
 const sanitizeRequestConfiguration = (req, res, next) => {
     try {
         ['body', 'query', 'params'].forEach((part) => {
             if (req[part] && typeof req[part] === 'object') {
+                logger.info(`🔍 Sanitizing request ${part}:`, req[part]); // Log original data
                 sanitize(req[part]);
+                logger.info(
+                    `✅ Strictly Sanitized request ${part}:`,
+                    req[part]
+                ); // Log sanitized data
             }
         });
     } catch (error) {
-        logger.error('Sanitization error:', error);
+        logger.error('❌ Strict Sanitization Error:', error);
 
-        return res.status(500).json({
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: 'Error processing requestBooks, please try again later.',
+            message: 'Error processing request, please try again later.',
         });
     }
 

@@ -49,14 +49,12 @@ const schemas = {
         },
         portfolio: {
             type: String,
-            validate: {
-                validator(v) {
-                    return /^https?:\/\/(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+\/?.*$/.test(
-                        v
-                    );
-                },
-                message: 'Portfolio must be a valid URL',
-            },
+            match: [
+                /^https?:\/\/(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+\/?.*$/,
+                'Portfolio must be a valid URL',
+            ],
+            minlength: [10, 'Portfolio must be at least 10 characters'],
+            maxlength: [100, 'Portfolio cannot exceed 100 characters'],
         },
         age: {
             type: Number,

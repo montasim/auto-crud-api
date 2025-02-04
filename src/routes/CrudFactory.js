@@ -1,6 +1,7 @@
 import express from 'express';
 import { faker } from '@faker-js/faker';
 import { Types } from 'mongoose';
+import RandExp from 'randexp';
 
 import logger from '../lib/logger.js';
 import schema from '../lib/schema.js';
@@ -35,25 +36,11 @@ const createCrudRoutes = (model, zodSchema) => {
     // Dummy Data Generation Helpers
     // ----------------------------------------------------------------------------------
 
-    const generateBangladeshiPhoneNumber = () => {
-        // Randomly choose the first digit after "01" from 3 to 9.
-        const operatorDigit = faker.helpers.arrayElement([
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-        ]);
-        // Generate the remaining 8 digits.
-        const remainingDigits = faker.string.numeric({ length: 8 });
-        // Optionally include the country code (+880).
-        return `+8801${operatorDigit}${remainingDigits}`;
-    };
-
     /**
-     * Generates a dummy value for a given field based on its type and name.
+     * Generates a dummy value for a given field based on its type and schema settings.
+     * - For string fields: if a regex (match) is provided in the schema options, it uses RandExp to generate
+     *   a value that matches the regex; otherwise, it generates lorem text that respects minlength and maxlength.
+     * - For other types, it uses the appropriate faker methods.
      *
      * @param {string} key - The field name.
      * @param {object} fieldSchema - The Mongoose schema field definition.
@@ -61,45 +48,110 @@ const createCrudRoutes = (model, zodSchema) => {
      */
     const generateFieldValue = (key, fieldSchema) => {
         const lowerKey = key.toLowerCase();
-        switch (fieldSchema.instance) {
-            case 'String':
-                if (lowerKey.includes('email')) {
-                    return faker.internet.email();
-                } else if (lowerKey.includes('nid')) {
-                    // Generate a numeric string with a random length between 10 and 17.
-                    const length = faker.number.int({ min: 10, max: 17 });
-                    return faker.string.numeric({ length });
-                } else if (lowerKey.includes('phone')) {
-                    // Generate a Bangladeshi phone number format.
-                    return generateBangladeshiPhoneNumber();
-                } else if (lowerKey.includes('bio')) {
-                    return faker.lorem.sentences(2);
-                } else if (lowerKey.includes('portfolio')) {
-                    return faker.internet.url();
+
+        // For String fields, we generate human-readable data based on the defined schema options.
+        if (fieldSchema.instance === 'String') {
+            // If a match rule is provided, inspect the regex string.
+            if (fieldSchema.options && fieldSchema.options.match) {
+                const regex = fieldSchema.options.match[0];
+                const regexStr = regex.toString();
+
+                // Heuristics based on the regex pattern:
+                if (regexStr.includes('@')) {
+                    // Likely an email.
+                    return faker.internet.email().toLowerCase();
+                } else if (regexStr.includes('https?:\\')) {
+                    // Generate a valid URL that meets the minlength and maxlength constraints.
+                    // Here we use a fixed base URL and a small random slug.
+                    const baseUrl = 'https://example.com/';
+                    // Ensure that baseUrl is already long enough (e.g. 20 characters).
+                    // Then append a short random slug so that the total length is within [10, 100].
+                    const slug = faker.string.alphanumeric({ length: 5 });
+                    const url = baseUrl + slug;
+                    // Optionally, if you want to be extra sure, you can trim if too long:
+                    return url.length > 100 ? url.slice(0, 100) : url;
+                } else if (
+                    regexStr.includes('^\\d') ||
+                    regexStr.includes('\\d+')
+                ) {
+                    // Likely a numeric string.
+                    const minLength = fieldSchema.options.minlength
+                        ? fieldSchema.options.minlength[0]
+                        : 5;
+                    // Generate a numeric string of the minimum required length.
+                    return faker.string.numeric({ length: minLength });
+                } else if (
+                    regexStr.includes('[A-Za-z') &&
+                    regexStr.includes('\\s')
+                ) {
+                    // Likely a name or text field with letters and spaces.
+                    // We'll generate lorem text using length constraints.
+                    const minLength = fieldSchema.options.minlength
+                        ? fieldSchema.options.minlength[0]
+                        : 5;
+                    const maxLength = fieldSchema.options.maxlength
+                        ? fieldSchema.options.maxlength[0]
+                        : 20;
+                    let text = faker.lorem.sentence();
+                    while (text.length < minLength) {
+                        text += ` ${faker.lorem.sentence()}`;
+                    }
+                    if (text.length > maxLength) {
+                        text = text.substring(0, maxLength);
+                        const lastSpace = text.lastIndexOf(' ');
+                        if (lastSpace > 0) {
+                            text = text.substring(0, lastSpace);
+                        }
+                    }
+                    return text.substring(0, maxLength / 3);
                 } else {
-                    return faker.lorem.words(3);
+                    // Fallback: use RandExp to generate a value that matches the regex.
+                    return new RandExp(regex).gen();
                 }
-            case 'Number': {
-                // Use schema options if available; otherwise, default to 0-100.
-                const min = fieldSchema.options.min
+            } else {
+                // No regex provided: generate human-readable lorem text using minlength and maxlength.
+                const minLength =
+                    fieldSchema.options && fieldSchema.options.minlength
+                        ? fieldSchema.options.minlength[0]
+                        : 5;
+                const maxLength =
+                    fieldSchema.options && fieldSchema.options.maxlength
+                        ? fieldSchema.options.maxlength[0]
+                        : 20;
+                let text = faker.lorem.sentence();
+                while (text.length < minLength) {
+                    text += ` ${faker.lorem.sentence()}`;
+                }
+                if (text.length > maxLength) {
+                    text = text.substring(0, maxLength);
+                    const lastSpace = text.lastIndexOf(' ');
+                    if (lastSpace > 0) {
+                        text = text.substring(0, lastSpace);
+                    }
+                }
+                return text;
+            }
+        } else if (fieldSchema.instance === 'Number') {
+            const min =
+                fieldSchema.options && fieldSchema.options.min
                     ? fieldSchema.options.min[0]
                     : 0;
-                const max = fieldSchema.options.max
+            const max =
+                fieldSchema.options && fieldSchema.options.max
                     ? fieldSchema.options.max[0]
                     : 100;
-                return faker.number.int({ min, max });
-            }
-            case 'Boolean':
-                return faker.datatype.boolean();
-            case 'Date':
-                return faker.date.past();
-            case 'ObjectId':
-            case 'ObjectID':
-                // For reference fields, generate a random ObjectId.
-                // Use the 'new' keyword to instantiate an ObjectId.
-                return new Types.ObjectId();
-            default:
-                return null;
+            return faker.number.int({ min, max });
+        } else if (fieldSchema.instance === 'Boolean') {
+            return faker.datatype.boolean();
+        } else if (fieldSchema.instance === 'Date') {
+            return faker.date.past();
+        } else if (
+            fieldSchema.instance === 'ObjectId' ||
+            fieldSchema.instance === 'ObjectID'
+        ) {
+            return new Types.ObjectId();
+        } else {
+            return null;
         }
     };
 
@@ -117,7 +169,7 @@ const createCrudRoutes = (model, zodSchema) => {
             for (const [key, fieldSchema] of Object.entries(
                 model.schema.paths
             )) {
-                // Skip internal fields like __v.
+                // Skip internal fields such as __v.
                 if (key === '__v') continue;
                 record[key] = generateFieldValue(key, fieldSchema);
             }

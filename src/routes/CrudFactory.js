@@ -136,7 +136,7 @@ const createCrudRoutes = (model, zodSchema) => {
      */
     const createDummyDocuments = async (req, res) => {
         const { count = 1 } = req.query;
-        const parsedCount = parseInt(count, 10);
+        const parsedCount = getIntValue(count);
         if (isNaN(parsedCount) || parsedCount <= 0) {
             const msg = `Bad Request: The "count" parameter must be a positive integer.`;
             logger.warn(msg);

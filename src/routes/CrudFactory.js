@@ -1,4 +1,6 @@
 import express from 'express';
+import { faker } from '@faker-js/faker';
+import { Types } from 'mongoose';
 
 import logger from '../lib/logger.js';
 import schema from '../lib/schema.js';
@@ -7,6 +9,7 @@ import sharedResponseTypes from '../utils/responseTypes.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import validate from '../utils/validate.js';
 import toSentenceCase from '../utils/toSentenceCase.js';
+import getIntValue from '../utils/getIntValue.js';
 
 const createCrudRoutes = (model, zodSchema) => {
     const router = express.Router();
@@ -28,9 +31,131 @@ const createCrudRoutes = (model, zodSchema) => {
     const getPopulatedDoc = async (docId) =>
         model.findById(docId).populate(refFields);
 
-    // ------------------------
-    // Route Handlers
-    // ------------------------
+    // ----------------------------------------------------------------------------------
+    // Dummy Data Generation Helpers
+    // ----------------------------------------------------------------------------------
+
+    const generateBangladeshiPhoneNumber = () => {
+        // Randomly choose the first digit after "01" from 3 to 9.
+        const operatorDigit = faker.helpers.arrayElement([
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+        ]);
+        // Generate the remaining 8 digits.
+        const remainingDigits = faker.string.numeric({ length: 8 });
+        // Optionally include the country code (+880).
+        return `+8801${operatorDigit}${remainingDigits}`;
+    };
+
+    /**
+     * Generates a dummy value for a given field based on its type and name.
+     *
+     * @param {string} key - The field name.
+     * @param {object} fieldSchema - The Mongoose schema field definition.
+     * @returns {*} - A dummy value.
+     */
+    const generateFieldValue = (key, fieldSchema) => {
+        const lowerKey = key.toLowerCase();
+        switch (fieldSchema.instance) {
+            case 'String':
+                if (lowerKey.includes('email')) {
+                    return faker.internet.email();
+                } else if (lowerKey.includes('nid')) {
+                    // Generate a numeric string with a random length between 10 and 17.
+                    const length = faker.number.int({ min: 10, max: 17 });
+                    return faker.string.numeric({ length });
+                } else if (lowerKey.includes('phone')) {
+                    // Generate a Bangladeshi phone number format.
+                    return generateBangladeshiPhoneNumber();
+                } else if (lowerKey.includes('bio')) {
+                    return faker.lorem.sentences(2);
+                } else if (lowerKey.includes('portfolio')) {
+                    return faker.internet.url();
+                } else {
+                    return faker.lorem.words(3);
+                }
+            case 'Number': {
+                // Use schema options if available; otherwise, default to 0-100.
+                const min = fieldSchema.options.min
+                    ? fieldSchema.options.min[0]
+                    : 0;
+                const max = fieldSchema.options.max
+                    ? fieldSchema.options.max[0]
+                    : 100;
+                return faker.number.int({ min, max });
+            }
+            case 'Boolean':
+                return faker.datatype.boolean();
+            case 'Date':
+                return faker.date.past();
+            case 'ObjectId':
+            case 'ObjectID':
+                // For reference fields, generate a random ObjectId.
+                // Use the 'new' keyword to instantiate an ObjectId.
+                return new Types.ObjectId();
+            default:
+                return null;
+        }
+    };
+
+    /**
+     * Generates an array of dummy data objects based on the model's schema.
+     *
+     * @param {number} count - Number of dummy records to generate.
+     * @returns {Promise<Array>} - An array of dummy data objects.
+     */
+    const generateDummyData = async (count) => {
+        const dummyData = [];
+        for (let i = 0; i < count; i++) {
+            const record = {};
+            // Iterate over each field in the schema.
+            for (const [key, fieldSchema] of Object.entries(
+                model.schema.paths
+            )) {
+                // Skip internal fields like __v.
+                if (key === '__v') continue;
+                record[key] = generateFieldValue(key, fieldSchema);
+            }
+            dummyData.push(record);
+        }
+        return dummyData;
+    };
+
+    // ----------------------------------------------------------------------------------
+    // Route Handler: Create Dummy Data
+    // ----------------------------------------------------------------------------------
+
+    /**
+     * Route handler to create dummy documents.
+     * Expects a query parameter "count" indicating how many dummy records to generate.
+     */
+    const createDummyDocuments = async (req, res) => {
+        const { count = 1 } = req.query;
+        const parsedCount = parseInt(count, 10);
+        if (isNaN(parsedCount) || parsedCount <= 0) {
+            const msg = `Bad Request: The "count" parameter must be a positive integer.`;
+            logger.warn(msg);
+            return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
+        }
+        // Generate dummy data based on the schema.
+        const dummyData = await generateDummyData(parsedCount);
+        // Insert the dummy records into the database.
+        await model.insertMany(dummyData);
+        const msg = `Success: ${parsedCount} ${sentenceCaseModelName}${
+            parsedCount !== 1 ? 's' : ''
+        } created with dummy data.`;
+        logger.info(msg);
+        return sharedResponseTypes.CREATED(req, res, {}, msg, dummyData);
+    };
+
+    // ----------------------------------------------------------------------------------
+    // (Existing CRUD route handlers remain unchanged)
+    // ----------------------------------------------------------------------------------
 
     // Create a document.
     const createDocument = async (req, res) => {
@@ -223,6 +348,17 @@ const createCrudRoutes = (model, zodSchema) => {
 
     // Group route paths to reduce redundancy.
     const createDocumentPaths = ['/', '/create', '/new'];
+    const createDummyDocumentPaths = [
+        '/create/dummy',
+        '/create-dummy',
+        '/create-dummy-data',
+        '/create-fake',
+        '/create-fake-data',
+        '/create-sample',
+        '/create-sample-data',
+        '/generate-sample',
+        '/generate-sample-data',
+    ];
     const getDocumentListPaths = [
         '/',
         '/all',
@@ -245,6 +381,11 @@ const createCrudRoutes = (model, zodSchema) => {
     // Create (POST)
     createDocumentPaths.forEach((path) => {
         router.post(path, validate(zodSchema), asyncHandler(createDocument));
+    });
+
+    // Create Dummy (POST)
+    createDummyDocumentPaths.forEach((path) => {
+        router.post(path, asyncHandler(createDummyDocuments));
     });
 
     // Read All (GET)

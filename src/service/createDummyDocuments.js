@@ -7,7 +7,7 @@ import sharedResponseTypes from '../utils/responseTypes.js';
 
 import getIntValue from '../utils/getIntValue.js';
 
-/*
+/**
  * Generates a dummy value for a given field based on its type and schema settings.
  * - For string fields: if a regex (match) is provided in the schema options, it uses RandExp to generate
  *   a value that matches the regex; otherwise, it generates lorem text that respects minlength and maxlength.

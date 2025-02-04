@@ -35,8 +35,8 @@ const sendResponse = (
     const originalSize = Buffer.byteLength(jsonResponse, 'utf8');
 
     // Check if client supports compression
-    const acceptEncoding = req.headers['accept-encoding'] || '';
-
+    // Safe check for `req.headers`
+    const acceptEncoding = req?.headers?.['accept-encoding'] || '';
     if (acceptEncoding.includes('gzip')) {
         zlib.gzip(jsonResponse, (err, compressed) => {
             if (err) {

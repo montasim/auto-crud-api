@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import RandExp from 'randexp';
-import { model, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 import logger from '../lib/logger.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
@@ -125,14 +125,15 @@ const generateFieldValue = (key, fieldSchema) => {
  * Generates an array of dummy data objects based on the model's schema.
  *
  * @param {number} count - Number of dummy records to generate.
+ * @param model
  * @returns {Promise<Array>} - An array of dummy data objects.
  */
-const generateDummyData = async (count) => {
+const generateDummyData = async (count, model) => {
     const dummyData = [];
     for (let i = 0; i < count; i++) {
         const record = {};
         // Iterate over each field in the schema.
-        for (const [key, fieldSchema] of Object.entries(model.schema.paths)) {
+        for (const [key, fieldSchema] of Object.entries(model?.schema?.paths)) {
             // Skip internal fields such as __v.
             if (key === '__v') continue;
             record[key] = generateFieldValue(key, fieldSchema);
@@ -165,7 +166,7 @@ const createDummyDocuments = async (
         return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
     }
     // Generate dummy data based on the schema.
-    const dummyData = await generateDummyData(parsedCount);
+    const dummyData = await generateDummyData(parsedCount, model);
     // Insert the dummy records into the database.
     await model.insertMany(dummyData);
     const msg = `Success: ${parsedCount} ${sentenceCaseModelName}${

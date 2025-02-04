@@ -54,6 +54,7 @@ const createCrudRoutes = (model, zodSchema) => {
             ],
             method: httpMethods.POST.toLowerCase(),
             handler: createDummyDocuments,
+            dataValidation: false,
         },
         {
             paths: ['/', '/all', '/list', '/read', '/show', '/view'],
@@ -90,23 +91,17 @@ const createCrudRoutes = (model, zodSchema) => {
 
     // Dynamic route creation.
     routesConfig.forEach(
-        ({ paths, method, handler, additionalParams = false }) => {
+        ({ paths, method, handler, dataValidation = true }) => {
             paths.forEach((path) => {
-                router[method](
-                    path,
-                    validate(zodSchema),
+                const middleware = [];
+
+                // ✅ Only add validation if `dataValidation` is `false`
+                if (dataValidation) {
+                    middleware.push(validate(zodSchema));
+                }
+
+                middleware.push(
                     asyncHandler((req, res) => {
-                        if (additionalParams) {
-                            return handler(
-                                req,
-                                res,
-                                model,
-                                uniqueFields,
-                                modelNameInSentenceCase,
-                                getPopulatedDocument,
-                                referenceFields
-                            );
-                        }
                         return handler(
                             req,
                             res,
@@ -118,6 +113,8 @@ const createCrudRoutes = (model, zodSchema) => {
                         );
                     })
                 );
+
+                router[method](path, ...middleware);
             });
         }
     );

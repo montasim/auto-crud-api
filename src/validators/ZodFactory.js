@@ -60,10 +60,10 @@ const createZodSchemas = (name, schemaDefinition) => {
         create: z.object(createSchema).strict(),
         update: z.object(updateSchema).strict(),
         read: z
-            .object({ idSchema, ...updateSchema })
+            .object({ id: idSchema, ...updateSchema })
             .strict()
             .partial(),
-        delete: z.object({ idSchema }).strict().partial(),
+        delete: z.object({ id: idSchema }).strict().partial(),
     };
 };
 

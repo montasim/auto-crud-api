@@ -13,12 +13,18 @@ import sharedResponseTypes from './utils/responseTypes.js';
 import helmetConfiguration from './configuration/helmet.js';
 import corsConfiguration from './configuration/cors.js';
 import hppConfiguration from './configuration/hpp.js';
-import compressionConfiguration from './configuration/compression.js';
+import {
+    compressionConfiguration,
+    measureCompressionSize,
+} from './configuration/compression.js';
 import morganConfiguration from './configuration/morgan.js';
 import sanitizeRequestConfiguration from './configuration/sanitizeRequest.js';
 import swaggerConfiguration from './configuration/swagger.js';
 
+import cspRoutes from './routes/CspRoutes.js';
+import hppRoutes from './routes/HppRoutes.js';
 import cspViolationReport from './service/cspViolationReport.js';
+
 import createMongooseModel from './models/SchemaFactory.js';
 import createZodSchema from './validators/ZodFactory.js';
 import createCrudRoutes from './routes/CrudFactory.js';
@@ -26,24 +32,25 @@ import createCrudRoutes from './routes/CrudFactory.js';
 const app = express();
 
 // Security middleware (early in the stack)
-app.use(helmet(helmetConfiguration)); // Helmet for basic security
-app.use(cors(corsConfiguration)); // Cross-origin request handling
-app.use(hppConfiguration()); // Prevent HTTP Parameter Pollution
-app.use(compressionConfiguration); // Compress responses for performance
+app.use(helmet(helmetConfiguration));
+app.use(cors(corsConfiguration));
+app.use(hppConfiguration());
+app.use(measureCompressionSize);
+app.use(compressionConfiguration);
 
 // Morgan HTTP request logger setup
-app.use(morganConfiguration); // HTTP request logging middleware
+app.use(morganConfiguration);
 
 // Body parsing middleware
-app.use(express.json({ limit: '20mb' })); // Body parsing for JSON
-app.use(express.urlencoded({ limit: '20mb', extended: true })); // Parse URL encoded data
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 // Sanitize request data (after body parsing for security)
 app.use(sanitizeRequestConfiguration);
 
 // CSP Violation Logging Endpoint
 app.post(
-    '/report/csp-violation',
+    '/api/report/csp-violation',
     express.json(),
     async (req, res) => await cspViolationReport(req, res)
 );
@@ -55,16 +62,20 @@ const swaggerDocs = swaggerJsdoc(swaggerConfiguration);
 Object.entries(schemas)?.forEach(([name, schemaDefinition]) => {
     const model = createMongooseModel(name, schemaDefinition);
     const zodSchema = createZodSchema(name, schemaDefinition);
-    app.use(`/api/${name}`, createCrudRoutes(model, zodSchema)); // Dynamically created routes
+    app.use(`/api/${name}`, createCrudRoutes(model, zodSchema));
 });
 
 // Serve Swagger UI for API documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Catch-all route for undefined routes (after all routes)
+// ✅ Attach CSP Violation Routes
+app.use('/api/report/csp-violation', cspRoutes);
+app.use('/api/report/hpp-violation', hppRoutes);
+
+// Catch-all route for undefined routes
 app.all('*', (req, res) => {
     const msg = `Not Found: The route ${req.method} ${req.originalUrl} does not exist.`;
-    logger.warn(msg); // Logs the undefined route request
+    logger.warn(msg);
     return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
 });
 

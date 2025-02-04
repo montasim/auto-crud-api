@@ -7,8 +7,7 @@ const createDocument = async (
     model,
     uniqueFields,
     sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    getPopulatedDoc
 ) => {
     // Check for uniqueness constraints.
     for (const field of uniqueFields) {

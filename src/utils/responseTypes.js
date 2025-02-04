@@ -67,12 +67,26 @@ const BAD_REQUEST = (req, res, headers = {}, message) =>
         {}
     );
 
+const INTERNAL_SERVER_ERROR = (req, res, headers = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        headers,
+        httpStatus.INTERNAL_SERVER_ERROR,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
+
 const sharedResponseTypes = {
     CREATED,
     OK,
     NOT_FOUND,
     CONFLICT,
     BAD_REQUEST,
+    INTERNAL_SERVER_ERROR,
 };
 
 export default sharedResponseTypes;

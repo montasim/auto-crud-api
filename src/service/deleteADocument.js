@@ -6,9 +6,7 @@ const deleteADocument = async (
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    sentenceCaseModelName
 ) => {
     const docId = req.params.id;
     const deletedDoc = await model.findByIdAndDelete(docId);

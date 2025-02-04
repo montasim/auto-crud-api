@@ -95,7 +95,7 @@ const schemas = {
             type: String,
             required: [true, 'Category is required'],
             match: [
-                /^[A-Za-z\s\-]{3,50}$/,
+                /^[A-Za-z\s-]{3,50}$/,
                 'Category must be between 3 and 50 characters and contain only letters and spaces',
             ],
         },

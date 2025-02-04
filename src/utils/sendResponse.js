@@ -1,4 +1,7 @@
-import useragent from 'useragent';
+import zlib from 'zlib';
+import httpStatus from 'http-status-lite';
+
+import logger from '../lib/logger.js';
 
 const sendResponse = (
     req,
@@ -11,38 +14,51 @@ const sendResponse = (
     pagination,
     errors
 ) => {
-    const timeStamp = new Date().toTimeString();
-    const timeZoneDetails =
-        req.headers['Time-Zone'] ||
-        Intl.DateTimeFormat().resolvedOptions().timeZone;
     const route = req.url;
+    const responsePayload = {
+        meta: {
+            // ...(timeStamp && { timeStamp }),
+            // ...(timeZoneDetails && { timeZone: timeZoneDetails }),
+            // ...(deviceDetails && { device: deviceDetails }),
+            // ...(ipAddress && { ip: ipAddress }),
+            ...(route && { route }),
+        },
+        status: {
+            ...(success && { success }),
+            ...(message && { message }),
+        },
+        ...(data && { data }),
+        ...(errors && { errors }),
+    };
+    // Convert response to JSON string
+    const jsonResponse = JSON.stringify(responsePayload);
+    const originalSize = Buffer.byteLength(jsonResponse, 'utf8');
 
-    // Detecting device details using the 'User-Agent' header
-    const agent = useragent.parse(req.headers['user-agent']);
-    const deviceDetails = agent.toString();
+    // Check if client supports compression
+    const acceptEncoding = req.headers['accept-encoding'] || '';
 
-    // Detecting IP address (support for proxies)
-    const ipAddress =
-        req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    if (acceptEncoding.includes('gzip')) {
+        zlib.gzip(jsonResponse, (err, compressed) => {
+            if (err) {
+                logger.error('❌ Compression Error:', err);
+            }
+            const compressedSize = compressed.length;
+            const compressionRatio =
+                ((originalSize - compressedSize) / originalSize) * 100;
 
-    return res
-        .status(status)
-        .set(headers)
-        .json({
-            meta: {
-                // ...(timeStamp && { timeStamp }),
-                // ...(timeZoneDetails && { timeZone: timeZoneDetails }),
-                // ...(deviceDetails && { device: deviceDetails }),
-                // ...(ipAddress && { ip: ipAddress }),
-                ...(route && { route }),
-            },
-            status: {
-                ...(success && { success }),
-                ...(message && { message }),
-            },
-            ...(data && { data }),
-            ...(errors && { errors }),
+            logger.info(
+                `📏 Compression Stats: Original Size: ${originalSize} bytes | Compressed: ${compressedSize} bytes | Reduction: ${compressionRatio.toFixed(2)}%`
+            );
+
+            res.setHeader('Content-Encoding', 'gzip');
+            res.setHeader('Content-Length', compressedSize);
+            res.setHeader('Content-Type', 'application/json');
+            res.status(httpStatus.OK).end(compressed);
         });
+    } else {
+        // Send uncompressed response
+        res.status(httpStatus.OK).json(responsePayload);
+    }
 };
 
 export default sendResponse;

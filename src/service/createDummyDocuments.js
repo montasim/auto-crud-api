@@ -1,3 +1,7 @@
+import { faker } from '@faker-js/faker';
+import RandExp from 'randexp';
+import { model, Types } from 'mongoose';
+
 import logger from '../lib/logger.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 
@@ -14,8 +18,6 @@ import getIntValue from '../utils/getIntValue.js';
  * @returns {*} - A dummy value.
  */
 const generateFieldValue = (key, fieldSchema) => {
-    const lowerKey = key.toLowerCase();
-
     // For String fields, we generate human-readable data based on the defined schema options.
     if (fieldSchema.instance === 'String') {
         // If a match rule is provided, inspect the regex string.
@@ -153,9 +155,7 @@ const createDummyDocuments = async (
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    sentenceCaseModelName
 ) => {
     const { count = 1 } = req.query;
     const parsedCount = getIntValue(count);

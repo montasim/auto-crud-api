@@ -24,8 +24,6 @@ const asyncHandler = (fn) => {
             );
 
             await fn(req, res, next);
-
-            logger.info(`ENDED: ${fn.name} - ${req.method} ${req.originalUrl}`);
         } catch (error) {
             let status;
             let message;

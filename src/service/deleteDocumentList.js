@@ -2,7 +2,13 @@ import schema from '../lib/schema.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 import logger from '../lib/logger.js';
 
-const deleteDocumentList = async (req, res) => {
+const deleteDocumentList = async (
+    req,
+    res,
+    model,
+    uniqueFields,
+    sentenceCaseModelName
+) => {
     // Validate the request using Zod.
     const validationResult = schema.idsSchema.safeParse(req.query);
     if (!validationResult.success) {

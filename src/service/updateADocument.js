@@ -7,8 +7,7 @@ const updateADocument = async (
     model,
     uniqueFields,
     sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    getPopulatedDoc
 ) => {
     const docId = req.params.id;
 

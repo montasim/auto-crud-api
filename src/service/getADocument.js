@@ -7,18 +7,16 @@ const getADocument = async (
     model,
     uniqueFields,
     sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    getPopulatedDoc
 ) => {
     const docId = req.params.id;
     const doc = await getPopulatedDoc(docId);
 
-    if (!doc)
-        return sharedResponseTypes.NOT_FOUND(
-            res,
-            {},
-            `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`
-        );
+    if (!doc) {
+        const msg = `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`;
+        logger.info(msg);
+        return sharedResponseTypes.NOT_FOUND(res, {}, msg);
+    }
 
     const msg = `Success: ${sentenceCaseModelName} with ID "${docId}" fetched with populated references.`;
     logger.info(msg);

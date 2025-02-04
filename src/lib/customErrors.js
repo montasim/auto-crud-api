@@ -52,6 +52,13 @@ class CriticalError extends Error {
     }
 }
 
+class EnvironmentVariableError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'EnvironmentVariableError';
+    }
+}
+
 export {
     AppError,
     ZodValidationError,
@@ -59,4 +66,5 @@ export {
     DuplicateKeyError,
     InvalidObjectIdError,
     CriticalError,
+    EnvironmentVariableError,
 };

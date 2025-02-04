@@ -29,6 +29,7 @@ const updateADocument = async (
     });
     if (!updatedDoc)
         return sharedResponseTypes.NOT_FOUND(
+            req,
             res,
             {},
             `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`

@@ -12,6 +12,7 @@ const deleteADocument = async (
     const deletedDoc = await model.findByIdAndDelete(docId);
     if (!deletedDoc)
         return sharedResponseTypes.NOT_FOUND(
+            req,
             res,
             {},
             `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`

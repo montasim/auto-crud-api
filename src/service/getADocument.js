@@ -15,7 +15,7 @@ const getADocument = async (
     if (!doc) {
         const msg = `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`;
         logger.info(msg);
-        return sharedResponseTypes.NOT_FOUND(res, {}, msg);
+        return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
     }
 
     const msg = `Success: ${sentenceCaseModelName} with ID "${docId}" fetched with populated references.`;

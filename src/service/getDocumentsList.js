@@ -48,6 +48,7 @@ const getDocumentsList = async (
         .limit(Number(limit));
     if (!docs.length)
         return sharedResponseTypes.NOT_FOUND(
+            req,
             res,
             {},
             `Not Found: no ${sentenceCaseModelName} exist right now.`

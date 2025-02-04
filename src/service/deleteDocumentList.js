@@ -26,6 +26,7 @@ const deleteDocumentList = async (
     const existingDocs = await model.find({ _id: { $in: docIds } });
     if (existingDocs.length !== docIds.length) {
         return sharedResponseTypes.NOT_FOUND(
+            req,
             res,
             {},
             `Not Found: Some ${sentenceCaseModelName} IDs do not exist. Deletion aborted.`

@@ -6,7 +6,6 @@ import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import schemas from '../schemas.js';
 import logger from './lib/logger.js';
 import sharedResponseTypes from './utils/responseTypes.js';
 
@@ -24,6 +23,8 @@ import swaggerConfiguration from './configuration/swagger.js';
 import cspRoutes from './routes/CspRoutes.js';
 import hppRoutes from './routes/HppRoutes.js';
 import cspViolationReport from './service/cspViolationReport.js';
+
+import configuration from './configuration/configuration.js';
 
 import createMongooseModel from './models/SchemaFactory.js';
 import createZodSchema from './validators/ZodFactory.js';
@@ -58,12 +59,26 @@ app.post(
 // Routes and Swagger documentation setup
 const swaggerDocs = swaggerJsdoc(swaggerConfiguration);
 
-// Dynamically create models, validators, and routes
-Object.entries(schemas)?.forEach(([name, schemaDefinition]) => {
-    const model = createMongooseModel(name, schemaDefinition);
-    const zodSchema = createZodSchema(name, schemaDefinition);
-    app.use(`/api/${name}`, createCrudRoutes(model, zodSchema));
-});
+// ✅ Dynamically create models, validators, and routes
+Object.entries(configuration.routesConfig).forEach(
+    ([name, { schema, routes }]) => {
+        logger.info(`✅ Creating routes for: ${name}`);
+
+        if (!Array.isArray(routes)) {
+            logger.error(
+                `❌ Error: "routes" must be an array in ${name}, but received ${typeof routes}`
+            );
+            return; // Skip this model to prevent crashes
+        }
+
+        const model = createMongooseModel(name, schema);
+        const zodSchema = createZodSchema(name, schema);
+        app.use(
+            `/api/${name}`,
+            createCrudRoutes(name, model, zodSchema, routes)
+        );
+    }
+);
 
 // Serve Swagger UI for API documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

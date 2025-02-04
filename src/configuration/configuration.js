@@ -6,6 +6,8 @@ import environments from '../constants/environments.js';
 import httpMethods from '../constants/httpMethods.js';
 import logger from '../lib/logger.js';
 
+import routesConfig from '../../routes.config.mjs';
+
 import { EnvironmentVariableError } from '../lib/customErrors.js';
 
 dotenv.config();
@@ -172,6 +174,8 @@ const configuration = {
         allowedOrigin: envVars.CORS_ALLOWED_ORIGIN,
         allowedHeaders: envVars.CORS_ALLOWED_HEADERS,
     },
+
+    routesConfig,
 };
 
 export default configuration;

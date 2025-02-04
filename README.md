@@ -174,7 +174,6 @@ Dummy data generation leverages Faker and RandExp to create valid records that c
 │   ├── models                    # (Optional) Custom models if needed.
 │   ├── routes                    # Dynamic CRUD routes are generated here.
 │   └── schema                    # Schema definitions and dynamic creation logic.
-│       ├── schemas.js            # Main schema definitions for users, products, orders.
 │       ├── createMongooseModel.js# Helper to create Mongoose models.
 │       └── createZodSchemas.js   # Helper to create Zod validation schemas.
 ├── lib
@@ -197,7 +196,7 @@ Dummy data generation leverages Faker and RandExp to create valid records that c
 
 ### Extending Schemas:
 
-Modify the `schemas.js` file to add or adjust fields and validations for your models.
+Modify the `routes.config.mjs` file to add or adjust fields and validations for your models and routes.
 
 ### Validation Rules:
 

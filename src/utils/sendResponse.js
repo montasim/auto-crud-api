@@ -53,11 +53,11 @@ const sendResponse = (
             res.setHeader('Content-Encoding', 'gzip');
             res.setHeader('Content-Length', compressedSize);
             res.setHeader('Content-Type', 'application/json');
-            res.status(httpStatus.OK).end(compressed);
+            res.status(status).end(compressed);
         });
     } else {
         // Send uncompressed response
-        res.status(httpStatus.OK).json(responsePayload);
+        res.status(status).json(responsePayload);
     }
 };
 

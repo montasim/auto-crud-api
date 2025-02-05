@@ -40,18 +40,20 @@
     "prettier:check": "prettier . --check",
     "prettier:fix": "prettier . --write",
     "lint:fix": "eslint . --fix && prettier . --write",
-    "build": "node terser.js",
+    "build": "node terser.js && npm run sentry:sourcemaps",
     "docker:build": "docker build --no-cache -t auto-crud-api .",
     "docker:run": "docker run --env-file .env.production -p 5000:5000 auto-crud-api",
     "docker:stop": "docker stop $(docker ps -q --filter ancestor=auto-crud-api) && docker rm $(docker ps -aq --filter ancestor=auto-crud-api)",
     "docker:rebuild": "docker-compose -f docker-compose-development.yml up --build --force-recreate",
     "docker:logs": "docker logs -f $(docker ps -q --filter ancestor=auto-crud-api)",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ndevers --project auto-crud-api ./build && sentry-cli sourcemaps upload --org ndevers --project auto-crud-api ./build"
   },
   "keywords": [],
   "license": "CC BY-NC-ND 4.0",
   "dependencies": {
     "@faker-js/faker": "^9.4.0",
+    "@sentry/cli": "^2.41.1",
     "@sentry/node": "^8.54.0",
     "@sentry/profiling-node": "^8.54.0",
     "axios": "^1.7.9",

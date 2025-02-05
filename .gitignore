@@ -95,3 +95,5 @@ next-env.d.ts
 # Use: Prevent multi user conflict
 ####################################################
 /public/assets
+# Sentry Config File
+.sentryclirc

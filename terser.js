@@ -81,12 +81,7 @@ const bytesToKilobytes = (bytes) => (bytes / 1024).toFixed(2);
 
 /**
  * Minifies a JavaScript file using Terser with the provided options.
- * @param {string} file - The filename.
- * @param {string} srcPath - The source path of the file.
- * @param {string} destPath - The destination path after processing.
- * @param {Object} options - Terser configuration options.
- * @param {Object} sizeTracker - Tracker for original and minified sizes.
- * @returns {Promise<string>} A promise that resolves to 'minified' upon successful minification.
+ * Generates a corresponding .map file.
  */
 const minifyJavaScript = async (
     file,
@@ -98,7 +93,15 @@ const minifyJavaScript = async (
     try {
         const fileContent = await fs.readFile(srcPath, 'utf8');
         const originalSize = await getFileSize(srcPath);
-        const terserResult = await minify(fileContent, options);
+
+        // Ensure Terser is configured to generate source maps
+        const terserResult = await minify(fileContent, {
+            ...options,
+            sourceMap: {
+                filename: path.basename(destPath),
+                url: `${path.basename(destPath)}.map`, // Generates inline source map reference
+            },
+        });
 
         if (terserResult.error) {
             throw new Error(
@@ -106,17 +109,23 @@ const minifyJavaScript = async (
             );
         }
 
+        // Write minified JavaScript
         await fs.writeFile(destPath, terserResult.code, 'utf8');
 
-        const newSize = await getFileSize(destPath);
+        // Write the .map file
+        const sourceMapPath = `${destPath}.map`;
+        if (terserResult.map) {
+            await fs.writeFile(sourceMapPath, terserResult.map, 'utf8');
+            console.log(`✅ Source map generated: ${sourceMapPath}`);
+        }
 
+        const newSize = await getFileSize(destPath);
         sizeTracker.originalTotal += originalSize;
         sizeTracker.minifiedTotal += newSize;
 
         return 'minified';
     } catch (error) {
-        console.error(`Error during the minification of ${file}. ${error}`);
-
+        console.error(`❌ Error during minification of ${file}: ${error}`);
         throw error;
     }
 };
@@ -141,14 +150,6 @@ const copyFile = async (srcPath, destPath) => {
     }
 };
 
-/**
- * Processes a list of files, minifying JavaScript files and copying other file types based on the configuration.
- * @param {Array<string>} files - The list of files to process.
- * @param {string} rootDir - The root directory for source files.
- * @param {string} outputDir - The output directory for processed files.
- * @param {Object} config - Configuration for processing.
- * @returns {Promise<Object>} A promise that resolves to an object containing the process statistics and size tracking.
- */
 const processFiles = async (files, rootDir, outputDir, config) => {
     const stats = { minified: 0, copied: 0, failed: 0 };
     const sizeTracker = { originalTotal: 0, minifiedTotal: 0 };
@@ -173,13 +174,25 @@ const processFiles = async (files, rootDir, outputDir, config) => {
                         sizeTracker
                     );
                     stats.minified++;
+
+                    // Copy source maps
+                    const sourceMapPath = `${srcPath}.map`;
+                    const destMapPath = `${destPath}.map`;
+
+                    try {
+                        await fs.copyFile(sourceMapPath, destMapPath);
+                        console.log(
+                            `Copied source map: ${sourceMapPath} -> ${destMapPath}`
+                        );
+                    } catch (err) {
+                        console.warn(`No source map found for: ${file}`);
+                    }
                 } else {
                     await copyFile(srcPath, destPath);
                     stats.copied++;
                 }
             } catch (error) {
                 console.error(`Error processing file ${file}. ${error}`);
-
                 stats.failed++;
             }
         })

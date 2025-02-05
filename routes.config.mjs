@@ -226,6 +226,14 @@ const routesConfig = {
                 minlength: [3, 'Name must be at least 3 characters'],
                 maxlength: [50, 'Name cannot exceed 50 characters'],
             },
+            image: {
+                id: {
+                    type: String,
+                },
+                link: {
+                    type: String,
+                },
+            },
             email: {
                 type: String,
                 required: [true, 'Email is required'],
@@ -237,7 +245,13 @@ const routesConfig = {
                 default: true,
             },
         },
-        schemaRules: {},
+        schemaRules: {
+            image: {
+                allowedMimeType: ['image/jpeg', 'image/png'],
+                minSize: 100, // 100 KB
+                maxSize: 1024, // 1 MB
+            },
+        },
         routes: [
             {
                 paths: ['/'],

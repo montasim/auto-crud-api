@@ -39,5 +39,10 @@
     "ecma": 5,
     "comments": false,
     "ascii_only": true
+  },
+  "sourceMap": {
+    "content": "inline",
+    "filename": "[name].js.map",
+    "includeSources": true
   }
 }

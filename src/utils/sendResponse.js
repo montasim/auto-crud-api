@@ -1,5 +1,4 @@
 import zlib from 'zlib';
-import httpStatus from 'http-status-lite';
 
 import logger from '../lib/logger.js';
 
@@ -59,6 +58,8 @@ const sendResponse = (
         // Send uncompressed response
         res.status(status).json(responsePayload);
     }
+
+    logger.info(responsePayload?.status?.message);
 };
 
 export default sendResponse;

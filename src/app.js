@@ -90,7 +90,6 @@ app.use('/api/report/hpp-violation', hppRoutes);
 // Catch-all route for undefined routes
 app.all('*', (req, res) => {
     const msg = `Not Found: The route ${req.method} ${req.originalUrl} does not exist.`;
-    logger.warn(msg);
     return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
 });
 

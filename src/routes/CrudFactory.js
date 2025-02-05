@@ -21,31 +21,40 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
     const getPopulatedDocument = async (documentId) =>
         model.findById(documentId).populate(referenceFields);
 
-    routes.forEach(({ paths, method, handler, dataValidation = true }) => {
-        paths.forEach((path) => {
-            const middleware = [];
+    routes.forEach(
+        ({
+            paths,
+            method,
+            handler,
+            dataValidation = true,
+            responsePipeline,
+        }) => {
+            paths.forEach((path) => {
+                const middleware = [];
 
-            if (dataValidation) {
-                middleware.push(validate(zodSchema));
-            }
+                if (dataValidation) {
+                    middleware.push(validate(zodSchema));
+                }
 
-            middleware.push(
-                asyncHandler((req, res) => {
-                    return handler(
-                        req,
-                        res,
-                        model,
-                        uniqueFields,
-                        modelNameInSentenceCase,
-                        getPopulatedDocument,
-                        referenceFields
-                    );
-                })
-            );
+                middleware.push(
+                    asyncHandler((req, res) => {
+                        return handler(
+                            req,
+                            res,
+                            model,
+                            uniqueFields,
+                            modelNameInSentenceCase,
+                            getPopulatedDocument,
+                            referenceFields,
+                            responsePipeline
+                        );
+                    })
+                );
 
-            router[method.toLowerCase()](path, ...middleware);
-        });
-    });
+                router[method.toLowerCase()](path, ...middleware);
+            });
+        }
+    );
 
     return router;
 };

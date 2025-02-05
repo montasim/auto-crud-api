@@ -2,9 +2,9 @@
 
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
-import httpStatus from 'http-status-lite';
 
 import logger from '../lib/logger.js';
+import responseTypes from '../utils/responseTypes.js';
 
 // Create a JSDOM window object to use with DOMPurify
 const { window } = new JSDOM('');
@@ -65,12 +65,8 @@ const sanitizeRequestConfiguration = (req, res, next) => {
             }
         });
     } catch (error) {
-        logger.error('❌ Strict Sanitization Error:', error);
-
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            success: false,
-            message: 'Error processing request, please try again later.',
-        });
+        const msg = `❌ Strict Sanitization Error: ${error}`;
+        return responseTypes.INTERNAL_SERVER_ERROR(req, res, {}, msg);
     }
 
     next();

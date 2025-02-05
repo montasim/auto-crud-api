@@ -1,26 +1,54 @@
 import sharedResponseTypes from '../utils/responseTypes.js';
-import logger from '../lib/logger.js';
+
+import convertToMongooseObjectId from '../utils/convertToMongooseObjectId.js';
 
 const getADocument = async (
     req,
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName,
-    getPopulatedDoc
+    modelNameInSentenceCase,
+    getPopulatedDocument,
+    referenceFields,
+    responsePipeline
 ) => {
-    const docId = req.params.id;
-    const doc = await getPopulatedDoc(docId);
+    const docId = convertToMongooseObjectId(req.params.id);
+    let doc = {};
 
-    if (!doc) {
-        const msg = `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`;
-        logger.info(msg);
+    if (responsePipeline) {
+        // Clone the pipeline to avoid modifying the original reference
+        const pipeline = [...responsePipeline];
+
+        // Check if a $match condition exists
+        const matchIndex = pipeline.findIndex((stage) => stage.$match);
+
+        if (matchIndex !== -1) {
+            // Modify the existing $match stage to filter by ID
+            pipeline[matchIndex].$match._id = docId;
+        } else {
+            // If no $match exists, add one to filter by ID
+            pipeline.unshift({ $match: { _id: docId } });
+        }
+
+        // Execute aggregation pipeline
+        doc = await model.aggregate(pipeline);
+    } else {
+        doc = await getPopulatedDocument(docId);
+    }
+
+    if (!doc || (Array.isArray(doc) && doc.length === 0)) {
+        const msg = `Not Found: ${modelNameInSentenceCase} with ID "${docId}" does not exist.`;
         return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
     }
 
-    const msg = `Success: ${sentenceCaseModelName} with ID "${docId}" fetched with populated references.`;
-    logger.info(msg);
-    return sharedResponseTypes.OK(req, res, {}, msg, doc);
+    const msg = `Success: ${modelNameInSentenceCase} with ID "${docId}" fetched with populated references.`;
+    return sharedResponseTypes.OK(
+        req,
+        res,
+        {},
+        msg,
+        Array.isArray(doc) ? doc[0] : doc
+    );
 };
 
 export default getADocument;

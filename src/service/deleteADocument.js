@@ -1,12 +1,14 @@
 import sharedResponseTypes from '../utils/responseTypes.js';
-import logger from '../lib/logger.js';
 
 const deleteADocument = async (
     req,
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName
+    modelNameInSentenceCase,
+    getPopulatedDocument,
+    referenceFields,
+    responsePipeline
 ) => {
     const docId = req.params.id;
     const deletedDoc = await model.findByIdAndDelete(docId);
@@ -15,11 +17,10 @@ const deleteADocument = async (
             req,
             res,
             {},
-            `Not Found: ${sentenceCaseModelName} with ID "${docId}" does not exist.`
+            `Not Found: ${modelNameInSentenceCase} with ID "${docId}" does not exist.`
         );
 
-    const msg = `Success: ${sentenceCaseModelName} with ID "${docId}" deleted successfully.`;
-    logger.info(msg);
+    const msg = `Success: ${modelNameInSentenceCase} with ID "${docId}" deleted successfully.`;
     return sharedResponseTypes.OK(req, res, {}, msg);
 };
 

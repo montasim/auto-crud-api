@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import RandExp from 'randexp';
 import { Types } from 'mongoose';
 
-import logger from '../lib/logger.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 import getIntValue from '../utils/getIntValue.js';
@@ -147,33 +146,58 @@ const generateDummyData = async (count, model) => {
 // Route Handler: Create Dummy Data
 // ----------------------------------------------------------------------------------
 
-/**
- * Route handler to create dummy documents.
- * Expects a query parameter "count" indicating how many dummy records to generate.
- */
 const createDummyDocuments = async (
     req,
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName
+    modelNameInSentenceCase,
+    getPopulatedDocument,
+    referenceFields,
+    responsePipeline
 ) => {
     const { count = 1 } = req.query;
     const parsedCount = getIntValue(count);
+
+    // 🔹 Validate 'count' parameter
     if (isNaN(parsedCount) || parsedCount <= 0) {
         const msg = `Bad Request: The "count" parameter must be a positive integer.`;
-        logger.warn(msg);
         return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
     }
-    // Generate dummy data based on the schema.
+
+    // 🔹 Generate dummy data based on the model schema
     const dummyData = await generateDummyData(parsedCount, model);
-    // Insert the dummy records into the database.
-    await model.insertMany(dummyData);
-    const msg = `Success: ${parsedCount} ${sentenceCaseModelName}${
-        parsedCount !== 1 ? 's' : ''
-    } created with dummy data.`;
-    logger.info(msg);
-    return sharedResponseTypes.CREATED(req, res, {}, msg, dummyData);
+
+    // 🔹 Insert dummy documents
+    const insertedDocs = await model.insertMany(dummyData, { ordered: false });
+
+    let finalDocs;
+    if (responsePipeline) {
+        // Ensure $match filters by newly inserted IDs
+        const insertedIds = insertedDocs.map((doc) => doc._id);
+        const pipeline = [...responsePipeline];
+
+        const matchIndex = pipeline.findIndex((stage) => stage.$match);
+        if (matchIndex !== -1) {
+            pipeline[matchIndex].$match = {
+                ...pipeline[matchIndex].$match,
+                _id: { $in: insertedIds },
+            };
+        } else {
+            pipeline.unshift({ $match: { _id: { $in: insertedIds } } });
+        }
+
+        // Fetch newly created documents using aggregation
+        finalDocs = await model.aggregate(pipeline);
+    } else {
+        // Fetch populated documents normally
+        finalDocs = await model
+            .find({ _id: { $in: insertedDocs.map((doc) => doc._id) } })
+            .populate(referenceFields);
+    }
+
+    const msg = `Success: ${parsedCount} ${modelNameInSentenceCase}${parsedCount !== 1 ? 's' : ''} created with dummy data.`;
+    return sharedResponseTypes.CREATED(req, res, {}, msg, finalDocs);
 };
 
 export default createDummyDocuments;

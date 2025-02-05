@@ -1,13 +1,15 @@
 import schema from '../lib/schema.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
-import logger from '../lib/logger.js';
 
 const deleteDocumentList = async (
     req,
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName
+    modelNameInSentenceCase,
+    getPopulatedDocument,
+    referenceFields,
+    responsePipeline
 ) => {
     // Validate the request using Zod.
     const validationResult = schema.idsSchema.safeParse(req.query);
@@ -35,14 +37,13 @@ const deleteDocumentList = async (
             req,
             res,
             {},
-            `Not Found: The following ${sentenceCaseModelName} ${missingIds.length < 1 ? 'IDs do' : 'ID does'} not exist: ${missingIds.join(', ')}. Deletion aborted.`
+            `Not Found: The following ${modelNameInSentenceCase} ${missingIds.length < 1 ? 'IDs do' : 'ID does'} not exist: ${missingIds.join(', ')}. Deletion aborted.`
         );
     }
 
     // Delete all matching documents.
     await model.deleteMany({ _id: { $in: docIds } });
-    const msg = `Success: ${sentenceCaseModelName} with ${docIds.length < 1 ? 'IDs' : 'ID'}: ${docIds.join(', ')} deleted successfully.`;
-    logger.info(msg);
+    const msg = `Success: ${modelNameInSentenceCase} with ${docIds.length < 1 ? 'IDs' : 'ID'}: ${docIds.join(', ')} deleted successfully.`;
     return sharedResponseTypes.OK(req, res, {}, msg);
 };
 

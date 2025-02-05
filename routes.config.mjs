@@ -155,29 +155,52 @@ const routesConfig = {
                 default: true,
             },
         },
+        schemaRules: {},
         routes: [
             {
-                paths: ['/', '/create', '/new'],
+                paths: ['/'],
                 method: httpMethods.POST,
                 handler: createDocument,
             },
             {
-                paths: ['/', '/all', '/list', '/read', '/show', '/view'],
+                paths: ['/', '/all', '/list'],
                 method: httpMethods.GET,
                 handler: getDocumentsList,
+                responsePipeline: [
+                    { $match: { isActive: true } },
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                        },
+                    },
+                ],
             },
             {
-                paths: ['/:id', '/read/:id', '/show/:id', '/view/:id'],
+                paths: ['/:id'],
                 method: httpMethods.GET,
                 handler: getADocument,
+                responsePipeline: [
+                    { $match: {} },
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                        },
+                    },
+                ],
             },
             {
-                paths: ['/:id', '/edit/:id', '/update/:id'],
+                paths: ['/:id'],
                 method: httpMethods.PATCH,
                 handler: updateADocument,
             },
             {
-                paths: ['/:id', '/delete/:id', '/destroy/:id'],
+                paths: ['/:id'],
                 method: httpMethods.DELETE,
                 handler: deleteADocument,
             },

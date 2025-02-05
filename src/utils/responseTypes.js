@@ -80,7 +80,7 @@ const INTERNAL_SERVER_ERROR = (req, res, headers = {}, message) =>
         {}
     );
 
-const sharedResponseTypes = {
+const responseTypes = {
     CREATED,
     OK,
     NOT_FOUND,
@@ -89,4 +89,4 @@ const sharedResponseTypes = {
     INTERNAL_SERVER_ERROR,
 };
 
-export default sharedResponseTypes;
+export default responseTypes;

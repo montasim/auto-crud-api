@@ -2,7 +2,7 @@
 
 import logger from '../lib/logger.js';
 import HppViolation from '../models/HppViolation.js';
-import sharedResponseTypes from '../utils/responseTypes.js';
+import responseTypes from '../utils/responseTypes.js';
 
 /**
  * Create an HPP violation report (Triggered by HPP detection).
@@ -11,15 +11,9 @@ const hppIncidentReport = async (req, res) => {
     const { parameter, values, ip, userAgent } = req.body;
 
     if (!parameter || !values || !ip) {
-        logger.warn(
-            '⚠️ Received an HPP violation report, but some details are missing.'
-        );
-        return sharedResponseTypes.BAD_REQUEST(
-            req,
-            res,
-            {},
-            'Missing required HPP violation details.'
-        );
+        const msg =
+            '⚠️ Received an HPP violation report, but some details are missing.';
+        return responseTypes.BAD_REQUEST(req, res, {}, msg);
     }
 
     const reportData = {
@@ -36,7 +30,7 @@ const hppIncidentReport = async (req, res) => {
     // Save to the database
     const savedReport = await HppViolation.create(reportData);
 
-    return sharedResponseTypes.CREATED(req, res, {}, '', savedReport);
+    return responseTypes.CREATED(req, res, {}, '', savedReport);
 };
 
 export default hppIncidentReport;

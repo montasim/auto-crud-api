@@ -1,4 +1,3 @@
-import logger from '../lib/logger.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 const getDocumentsList = async (
@@ -6,24 +5,26 @@ const getDocumentsList = async (
     res,
     model,
     uniqueFields,
-    sentenceCaseModelName,
-    getPopulatedDoc,
-    refFields
+    modelNameInSentenceCase,
+    getPopulatedDocument,
+    referenceFields,
+    responsePipeline
 ) => {
-    // Destructure pagination and sorting parameters, and capture the rest as filters.
+    // Destructure pagination, sorting, and filters from query parameters
     const { page = 1, limit = 10, sort = '-createdAt', ...filters } = req.query;
+    const parsedPage = Math.max(1, Number(page)); // Ensure page is at least 1
+    const parsedLimit = Math.max(1, Number(limit)); // Ensure limit is at least 1
 
-    // Detect invalid keys (e.g., keys that start with '?').
+    // 🔹 Detect invalid query parameters
     const invalidKeys = Object.keys(filters).filter((key) =>
         key.startsWith('?')
     );
     if (invalidKeys.length > 0) {
         const msg = `Bad Request: Invalid query parameter(s) detected: ${invalidKeys.join(', ')}.`;
-        logger.warn(msg);
         return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
     }
 
-    // Build a filter query by including only non-empty filter values.
+    // 🔹 Build a filter query including only valid non-empty filter values
     const filterQuery = {};
     Object.keys(filters).forEach((key) => {
         if (filters[key] !== '') {
@@ -31,7 +32,7 @@ const getDocumentsList = async (
         }
     });
 
-    // Convert filter values to numbers for numeric fields.
+    // Convert filter values to numbers for numeric fields
     Object.keys(filterQuery).forEach((key) => {
         const schemaPath = model.schema.paths[key];
         if (schemaPath && schemaPath.instance === 'Number') {
@@ -39,33 +40,77 @@ const getDocumentsList = async (
         }
     });
 
-    // Execute the query with filtering, sorting, and pagination.
-    const docs = await model
-        .find(filterQuery)
-        .populate(refFields) // Dynamically populate referenced fields.
-        .sort(sort)
-        .skip((page - 1) * Number(limit))
-        .limit(Number(limit));
-    if (!docs.length)
-        return sharedResponseTypes.NOT_FOUND(
-            req,
-            res,
-            {},
-            `Not Found: no ${sentenceCaseModelName} exist right now.`
+    let docs = [];
+    let totalCount = 0;
+
+    if (responsePipeline) {
+        // 🔹 Optimize aggregation pipeline to include pagination & sorting
+        const pipeline = [...responsePipeline];
+
+        // Ensure existing `$match` stage includes filters
+        const matchIndex = pipeline.findIndex((stage) => stage.$match);
+        if (matchIndex !== -1) {
+            pipeline[matchIndex].$match = {
+                ...pipeline[matchIndex].$match,
+                ...filterQuery,
+            };
+        } else {
+            pipeline.unshift({ $match: filterQuery });
+        }
+
+        // Sorting stage (if applicable)
+        if (sort) {
+            const sortObj = {};
+            sort.split(',').forEach((field) => {
+                const order = field.startsWith('-') ? -1 : 1;
+                sortObj[field.replace('-', '')] = order;
+            });
+            pipeline.push({ $sort: sortObj });
+        }
+
+        // Pagination stage
+        pipeline.push(
+            { $skip: (parsedPage - 1) * parsedLimit },
+            { $limit: parsedLimit }
         );
 
-    // Get the total count of documents matching the filter conditions (without pagination).
-    const totalCount = docs?.length;
+        // Count stage (optional)
+        pipeline.push({
+            $facet: {
+                data: pipeline,
+                totalCount: [{ $count: 'count' }],
+            },
+        });
 
-    // Build a condition string for the response message.
+        // Execute aggregation pipeline
+        const result = await model.aggregate(pipeline);
+        docs = result[0]?.data || [];
+        totalCount = result[0]?.totalCount?.[0]?.count || 0;
+    } else {
+        // 🔹 Query the database with filtering, sorting, pagination
+        docs = await model
+            .find(filterQuery)
+            .populate(referenceFields)
+            .sort(sort)
+            .skip((parsedPage - 1) * parsedLimit)
+            .limit(parsedLimit);
+
+        // Get the total count of documents matching the filter conditions
+        totalCount = await model.countDocuments(filterQuery);
+    }
+
+    if (!docs.length) {
+        const msg = `Not Found: No ${modelNameInSentenceCase}s exist with the given filters.`;
+        return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
+    }
+
+    // 🔹 Build a filter condition string for logging
     const conditionStr = Object.keys(filterQuery).length
         ? JSON.stringify(filterQuery)
         : 'No filters applied';
 
-    const msg = `Success: ${totalCount} ${sentenceCaseModelName}${totalCount !== 1 ? 's' : ''} fetched with filters: ${conditionStr}, sorted by '${sort}', page ${page}, and limit ${limit}.`;
-    logger.info(msg);
-
-    // Return both the total count and the documents.
+    const msg = `Success: ${totalCount} ${modelNameInSentenceCase}${totalCount !== 1 ? 's' : ''} fetched with filters: ${conditionStr}, sorted by '${sort}', page ${parsedPage}, and limit ${parsedLimit}.`;
+    // Return both the total count and the documents
     return sharedResponseTypes.OK(req, res, {}, msg, docs, totalCount);
 };
 

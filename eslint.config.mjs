@@ -109,6 +109,7 @@ export default [
             'src/modules/api/documentation/**', // Ignore auto-generated API documentation files
 
             'yarn.lock', // Ignore the Yarn lock file (used for dependency resolution)
+            'terser.js', // Ignore the Terser script used for minification
         ],
     },
 ];

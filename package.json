@@ -32,8 +32,9 @@
     }
   },
   "scripts": {
-    "start": "node ./build/server.js",
-    "dev": "nodemon server.js",
+    "start": "pm2 start ./build/server.js --watch --ignore-watch=\"node_modules\"",
+    "restart": "pm2 restart server",
+    "dev": "nodemon --watch .env server.js",
     "eslint:check": "eslint .",
     "eslint:fix": "eslint . --fix",
     "prettier:check": "prettier . --check",
@@ -66,6 +67,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.6",
     "morgan": "^1.10.0",
+    "pm2": "^5.4.3",
     "randexp": "^0.5.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

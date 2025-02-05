@@ -10,8 +10,6 @@ import path from 'path';
 import { globSync } from 'glob';
 import { minify } from 'terser';
 
-import logger from './src/lib/logger.js';
-
 const ROOT_DIR = '.';
 const OUTPUT_DIR = path.join(ROOT_DIR, 'build');
 const CONFIG_FILE = path.join(ROOT_DIR, 'terserrc.json');
@@ -28,7 +26,7 @@ const loadConfig = async (filePath) => {
 
         return JSON.parse(configData);
     } catch (error) {
-        logger.error(
+        console.error(
             `Failed to load configuration from ${filePath}. Please check if the file exists and is correctly formatted. Error: ${error}`
         );
 
@@ -46,7 +44,7 @@ const ensureDirectoryExists = async (directory) => {
         await fs.mkdir(directory, { recursive: true });
     } catch (error) {
         if (error.code !== 'EEXIST') {
-            logger.error(
+            console.error(
                 `Failed to create directory ${directory}. Error: ${error}`
             );
 
@@ -66,7 +64,7 @@ const getFileSize = async (filePath) => {
 
         return stats.size;
     } catch {
-        logger.error(
+        console.error(
             `Failed to get file size for ${filePath}. File may not exist or access may be denied.`
         );
 
@@ -117,7 +115,7 @@ const minifyJavaScript = async (
 
         return 'minified';
     } catch (error) {
-        logger.error(`Error during the minification of ${file}. ${error}`);
+        console.error(`Error during the minification of ${file}. ${error}`);
 
         throw error;
     }
@@ -135,7 +133,7 @@ const copyFile = async (srcPath, destPath) => {
 
         return 'copied';
     } catch (error) {
-        logger.error(
+        console.error(
             `Failed to copy file from ${srcPath} to ${destPath}. Error: ${error}`
         );
 
@@ -163,7 +161,10 @@ const processFiles = async (files, rootDir, outputDir, config) => {
             try {
                 await ensureDirectoryExists(path.dirname(destPath));
 
-                if (file.endsWith('.js')) {
+                if (
+                    file.endsWith('.js') &&
+                    !file.includes('configuration.js')
+                ) {
                     await minifyJavaScript(
                         file,
                         srcPath,
@@ -177,7 +178,7 @@ const processFiles = async (files, rootDir, outputDir, config) => {
                     stats.copied++;
                 }
             } catch (error) {
-                logger.error(`Error processing file ${file}. ${error}`);
+                console.error(`Error processing file ${file}. ${error}`);
 
                 stats.failed++;
             }
@@ -197,7 +198,7 @@ const main = async () => {
         const config = await loadConfig(CONFIG_FILE);
 
         if (!config) {
-            logger.error(
+            console.error(
                 'Configuration is missing or invalid. Processing cannot continue.'
             );
             return;
@@ -217,7 +218,7 @@ const main = async () => {
             config
         );
 
-        logger.table({
+        console.table({
             Total: allFiles.length,
             Minified: stats.minified,
             Copied: stats.copied,
@@ -230,8 +231,10 @@ const main = async () => {
             ),
         });
     } catch (error) {
-        logger.error(`Failed to execute the main process. ${error}`);
+        console.error(`Failed to execute the main process. ${error}`);
     }
 };
 
-main().catch((error) => logger.error(`An unexpected error occurred: ${error}`));
+main().catch((error) =>
+    console.error(`An unexpected error occurred: ${error}`)
+);

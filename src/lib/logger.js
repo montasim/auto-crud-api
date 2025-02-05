@@ -36,7 +36,7 @@ const createDailyRotateTransport = (filename, level) =>
 
 // Create logger instance
 const logger = winston.createLogger({
-    level: 'info',
+    level: 'debug',
     format: customFormat, // Apply the custom format globally
     transports: [
         new winston.transports.Console({ format: customFormat }), // Console logging with symbols

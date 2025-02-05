@@ -1,5 +1,6 @@
 import { Schema, Types } from 'mongoose';
 import contentTypes from 'content-types-lite';
+import mimeTypes from 'mime-types-lite';
 
 import constants from './src/constants/constants.js';
 import httpMethods from './src/constants/httpMethods.js';
@@ -132,89 +133,7 @@ const routesConfig = {
         ],
     },
 
-    admins: {
-        schema: {
-            name: {
-                type: String,
-                required: [true, 'Name is required'],
-                match: [
-                    /^[A-Za-z\s]{3,50}$/,
-                    'Name must be between 3 and 50 characters and contain only letters and spaces',
-                ],
-                minlength: [3, 'Name must be at least 3 characters'],
-                maxlength: [50, 'Name cannot exceed 50 characters'],
-            },
-            email: {
-                type: String,
-                required: [true, 'Email is required'],
-                unique: true,
-                match: [constants.emailRegex, 'Invalid email format'],
-            },
-            isActive: {
-                type: Boolean,
-                default: true,
-            },
-        },
-        schemaRules: {},
-        routes: [
-            {
-                paths: ['/'],
-                method: httpMethods.POST,
-                handler: createDocument,
-            },
-            {
-                paths: ['/', '/all', '/list'],
-                method: httpMethods.GET,
-                handler: getDocumentsList,
-                rules: {
-                    request: {},
-                    response: {
-                        contentType: contentTypes.JSON,
-                        pipeline: [{ $match: { isActive: false } }],
-                    },
-                },
-            },
-            {
-                paths: ['/:id'],
-                method: httpMethods.GET,
-                handler: getADocument,
-                responsePipeline: [
-                    { $match: {} },
-                    {
-                        $project: {
-                            _id: 1,
-                            name: 1,
-                            createdAt: 1,
-                            updatedAt: 1,
-                        },
-                    },
-                ],
-            },
-            {
-                paths: ['/:id'],
-                method: httpMethods.PATCH,
-                handler: updateADocument,
-            },
-            {
-                paths: ['/:id'],
-                method: httpMethods.DELETE,
-                handler: deleteADocument,
-            },
-            {
-                paths: [
-                    '/',
-                    '/delete-list',
-                    '/delete-by-list',
-                    '/destroy-list',
-                    '/destroy-by-list',
-                ],
-                method: httpMethods.DELETE,
-                handler: deleteDocumentList,
-            },
-        ],
-    },
-
-    adminsNew: {
+    members: {
         schema: {
             name: {
                 type: String,
@@ -240,14 +159,11 @@ const routesConfig = {
                 unique: true,
                 match: [constants.emailRegex, 'Invalid email format'],
             },
-            isActive: {
-                type: Boolean,
-                default: true,
-            },
         },
         schemaRules: {
             image: {
-                allowedMimeType: ['image/jpeg', 'image/png'],
+                allowedMimeType: [mimeTypes.JPEG, mimeTypes.PNG, mimeTypes.GIF],
+                maxFile: 1,
                 minSize: 100, // 100 KB
                 maxSize: 1024, // 1 MB
             },
@@ -259,7 +175,7 @@ const routesConfig = {
                 handler: createDocument,
                 rules: {
                     request: {
-                        contentType: contentTypes.JSON,
+                        contentType: contentTypes.MULTIPART_FORM_DATA,
                     },
                     response: {
                         contentType: contentTypes.JSON,
@@ -302,155 +218,6 @@ const routesConfig = {
             },
             {
                 paths: ['/:id'],
-                method: httpMethods.DELETE,
-                handler: deleteADocument,
-            },
-            {
-                paths: [
-                    '/',
-                    '/delete-list',
-                    '/delete-by-list',
-                    '/destroy-list',
-                    '/destroy-by-list',
-                ],
-                method: httpMethods.DELETE,
-                handler: deleteDocumentList,
-            },
-        ],
-    },
-
-    products: {
-        schema: {
-            name: {
-                type: String,
-                required: [true, 'Product name is required'],
-                minlength: [3, 'Product name must be at least 3 characters'],
-                maxlength: [100, 'Product name cannot exceed 100 characters'],
-                match: [
-                    /^[A-Za-z0-9\s\-,.&()]{3,100}$/,
-                    'Product name must be between 3 and 100 characters and contain only valid characters',
-                ],
-            },
-            price: {
-                type: Number,
-                required: [true, 'Product price is required'],
-                min: [0, 'Price cannot be negative'],
-                max: [1000000, 'Price cannot exceed 1,000,000'],
-            },
-            stock: {
-                type: Number,
-                required: [true, 'Stock quantity is required'],
-                min: [0, 'Stock quantity cannot be negative'],
-                max: [100000, 'Stock quantity cannot exceed 100,000'],
-            },
-            category: {
-                type: String,
-                required: [true, 'Category is required'],
-                match: [
-                    /^[A-Za-z\s-]{3,50}$/,
-                    'Category must be between 3 and 50 characters and contain only letters and spaces',
-                ],
-            },
-        },
-        routes: [
-            {
-                paths: ['/', '/create', '/new'],
-                method: httpMethods.POST,
-                handler: createDocument,
-            },
-            {
-                paths: ['/', '/all', '/list', '/read', '/show', '/view'],
-                method: httpMethods.GET,
-                handler: getDocumentsList,
-            },
-            {
-                paths: ['/:id', '/read/:id', '/show/:id', '/view/:id'],
-                method: httpMethods.GET,
-                handler: getADocument,
-            },
-            {
-                paths: ['/:id', '/edit/:id', '/update/:id'],
-                method: httpMethods.PATCH,
-                handler: updateADocument,
-            },
-            {
-                paths: ['/:id', '/delete/:id', '/destroy/:id'],
-                method: httpMethods.DELETE,
-                handler: deleteADocument,
-            },
-            {
-                paths: [
-                    '/',
-                    '/delete-list',
-                    '/delete-by-list',
-                    '/destroy-list',
-                    '/destroy-by-list',
-                ],
-                method: httpMethods.DELETE,
-                handler: deleteDocumentList,
-            },
-        ],
-    },
-
-    orders: {
-        schema: {
-            userId: {
-                type: Schema.Types.ObjectId,
-                ref: 'users',
-                required: [true, 'User ID is required'],
-                validate: {
-                    validator(v) {
-                        return Types.ObjectId.isValid(v);
-                    },
-                    message: 'Invalid User ID format',
-                },
-            },
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: 'products',
-                required: [true, 'Product ID is required'],
-                validate: {
-                    validator(v) {
-                        return Types.ObjectId.isValid(v);
-                    },
-                    message: 'Invalid Product ID format',
-                },
-            },
-            quantity: {
-                type: Number,
-                required: [true, 'Order quantity is required'],
-                min: [1, 'Order quantity must be at least 1'],
-                max: [1000, 'Order quantity cannot exceed 1000'],
-            },
-            total: {
-                type: Number,
-                required: [true, 'Total amount is required'],
-                min: [1, 'Total amount must be at least 1'],
-            },
-        },
-        routes: [
-            {
-                paths: ['/', '/create', '/new'],
-                method: httpMethods.POST,
-                handler: createDocument,
-            },
-            {
-                paths: ['/', '/all', '/list', '/read', '/show', '/view'],
-                method: httpMethods.GET,
-                handler: getDocumentsList,
-            },
-            {
-                paths: ['/:id', '/read/:id', '/show/:id', '/view/:id'],
-                method: httpMethods.GET,
-                handler: getADocument,
-            },
-            {
-                paths: ['/:id', '/edit/:id', '/update/:id'],
-                method: httpMethods.PATCH,
-                handler: updateADocument,
-            },
-            {
-                paths: ['/:id', '/delete/:id', '/destroy/:id'],
                 method: httpMethods.DELETE,
                 handler: deleteADocument,
             },

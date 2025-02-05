@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import multer from 'multer';
 
 import logger from './lib/logger.js';
 import sharedResponseTypes from './utils/responseTypes.js';
@@ -31,6 +32,7 @@ import createZodSchema from './validators/ZodFactory.js';
 import createCrudRoutes from './routes/CrudFactory.js';
 
 const app = express();
+const upload = multer();
 
 // Security middleware (early in the stack)
 logger.debug('Initializing security middleware...');
@@ -75,7 +77,7 @@ logger.debug('Swagger API documentation available at /api/docs');
 // ✅ Dynamically create models, validators, and routes
 logger.debug('Initializing dynamic route creation...');
 Object.entries(configuration.routesConfig).forEach(
-    ([name, { schema, routes }]) => {
+    ([name, { schema, routes, schemaRules }]) => {
         logger.info(`Creating routes for: ${name}`);
 
         if (!Array.isArray(routes)) {
@@ -87,7 +89,13 @@ Object.entries(configuration.routesConfig).forEach(
 
         const model = createMongooseModel(name, schema);
         const zodSchema = createZodSchema(name, schema);
-        const router = createCrudRoutes(name, model, zodSchema, routes);
+        const router = createCrudRoutes(
+            name,
+            model,
+            zodSchema,
+            routes,
+            schemaRules
+        );
 
         routes.forEach(({ paths, method }) => {
             paths.forEach((path) => {
@@ -113,7 +121,7 @@ app.get('/debug-sentry', (req, res, error) => {
 });
 
 // Optional fallthrough error handler
-app.use((err, req, res, next) => {
+app.use(() => (err, req, res, next) => {
     // The error ID is attached to `res.sentry` to be returned
     // and optionally displayed to the user for support.
     res.status(500).end(`${res.sentry}\n`);

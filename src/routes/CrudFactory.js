@@ -1,10 +1,54 @@
 import express from 'express';
-
+import multer from 'multer';
 import asyncHandler from '../utils/asyncHandler.js';
 import validateInput from '../middlewares/validateInput.js';
 import toSentenceCase from '../utils/toSentenceCase.js';
 
-const createCrudRoutes = (modelName, model, zodSchema, routes) => {
+/**
+ * Creates dynamic Multer middleware based on schema rules.
+ */
+const createMulterMiddleware = (schemaRules) => {
+    return Object.entries(schemaRules).reduce(
+        (middlewareMap, [field, rules]) => {
+            if (rules.allowedMimeType) {
+                const storage = multer.memoryStorage();
+
+                const upload = multer({
+                    storage,
+                    limits: {
+                        fileSize: rules.maxSize * 1024, // Convert KB to bytes
+                    },
+                    fileFilter: (req, file, cb) => {
+                        if (!rules.allowedMimeType.includes(file.mimetype)) {
+                            return cb(
+                                new Error(
+                                    `Invalid file type. Allowed types: ${rules.allowedMimeType.join(', ')}`
+                                )
+                            );
+                        }
+                        cb(null, true);
+                    },
+                });
+
+                middlewareMap[field] = upload.array(field, rules.maxFile || 1);
+            }
+
+            return middlewareMap;
+        },
+        {}
+    );
+};
+
+/**
+ * Creates CRUD routes dynamically.
+ */
+const createCrudRoutes = (
+    modelName,
+    model,
+    zodSchema,
+    routes,
+    schemaRules = {}
+) => {
     const router = express.Router();
     const modelNameInSentenceCase = toSentenceCase(modelName);
 
@@ -21,14 +65,30 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
     const getPopulatedDocument = async (documentId) =>
         model.findById(documentId).populate(referenceFields);
 
+    // Generate multer middlewares for applicable fields
+    const uploadMiddlewares = createMulterMiddleware(schemaRules);
+
     routes.forEach(
         ({ paths, method, handler, dataValidation = true, rules }) => {
             paths.forEach((path) => {
                 const middleware = [];
 
+                // Apply file upload middleware if applicable
+                Object.keys(uploadMiddlewares).forEach((field) => {
+                    middleware.push(uploadMiddlewares[field]);
+                });
+
+                // Apply request validation
                 if (dataValidation) {
                     middleware.push((req, res, next) =>
-                        validateInput(req, res, next, zodSchema, rules)
+                        validateInput(
+                            req,
+                            res,
+                            next,
+                            zodSchema,
+                            rules,
+                            schemaRules
+                        )
                     );
                 }
 

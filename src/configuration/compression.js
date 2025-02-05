@@ -58,7 +58,7 @@ const measureCompressionSize = (req, res, next) => {
         }
 
         // Simulate compression (since actual compression is handled internally)
-        compressedSize = Buffer.concat(chunks).length;
+        compressedSize = Buffer?.concat(chunks)?.length;
 
         // Log size difference
         const reductionPercentage =

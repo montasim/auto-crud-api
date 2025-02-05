@@ -35,7 +35,7 @@ const sanitize = (obj) => {
 
                 if (value !== sanitizedValue) {
                     logger.warn(
-                        `⚠️ Strict Sanitization Applied: Key '${key}' was modified due to potential XSS.`
+                        `Strict Sanitization Applied: Key '${key}' was modified due to potential XSS.`
                     );
                 }
 
@@ -56,16 +56,13 @@ const sanitizeRequestConfiguration = (req, res, next) => {
     try {
         ['body', 'query', 'params'].forEach((part) => {
             if (req[part] && typeof req[part] === 'object') {
-                logger.info(`🔍 Sanitizing request ${part}:`, req[part]); // Log original data
+                logger.info(`Sanitizing request ${part}:`, req[part]); // Log original data
                 sanitize(req[part]);
-                logger.info(
-                    `✅ Strictly Sanitized request ${part}:`,
-                    req[part]
-                ); // Log sanitized data
+                logger.info(`Strictly Sanitized request ${part}:`, req[part]); // Log sanitized data
             }
         });
     } catch (error) {
-        const msg = `❌ Strict Sanitization Error: ${error}`;
+        const msg = `Strict Sanitization Error: ${error}`;
         return responseTypes.INTERNAL_SERVER_ERROR(req, res, {}, msg);
     }
 

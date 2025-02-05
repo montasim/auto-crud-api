@@ -27,7 +27,9 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
                 const middleware = [];
 
                 if (dataValidation) {
-                    middleware.push(validateInput(zodSchema, rules));
+                    middleware.push((req, res, next) =>
+                        validateInput(req, res, next, zodSchema, rules)
+                    );
                 }
 
                 middleware.push(

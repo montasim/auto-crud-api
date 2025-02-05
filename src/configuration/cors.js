@@ -15,7 +15,7 @@ const corsConfiguration = {
         if (!origin || whitelist.includes(origin)) {
             callback(null, true);
         } else {
-            const msg = `❌ CORS Error: Request from origin '${origin}' blocked. Allowed origins: ${JSON.stringify(whitelist)}`;
+            const msg = `CORS Error: Request from origin '${origin}' blocked. Allowed origins: ${JSON.stringify(whitelist)}`;
 
             logger.error(msg, {
                 origin,

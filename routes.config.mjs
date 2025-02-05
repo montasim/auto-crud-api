@@ -214,6 +214,97 @@ const routesConfig = {
         ],
     },
 
+    adminsNew: {
+        schema: {
+            name: {
+                type: String,
+                required: [true, 'Name is required'],
+                match: [
+                    /^[A-Za-z\s]{3,50}$/,
+                    'Name must be between 3 and 50 characters and contain only letters and spaces',
+                ],
+                minlength: [3, 'Name must be at least 3 characters'],
+                maxlength: [50, 'Name cannot exceed 50 characters'],
+            },
+            email: {
+                type: String,
+                required: [true, 'Email is required'],
+                unique: true,
+                match: [constants.emailRegex, 'Invalid email format'],
+            },
+            isActive: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        schemaRules: {},
+        routes: [
+            {
+                paths: ['/'],
+                method: httpMethods.POST,
+                handler: createDocument,
+                rules: {
+                    request: {
+                        contentType: contentTypes.JSON,
+                    },
+                    response: {
+                        contentType: contentTypes.JSON,
+                        pipeline: [],
+                    },
+                },
+            },
+            {
+                paths: ['/', '/all', '/list'],
+                method: httpMethods.GET,
+                handler: getDocumentsList,
+                rules: {
+                    request: {},
+                    response: {
+                        contentType: contentTypes.JSON,
+                        pipeline: [{ $match: { isActive: false } }],
+                    },
+                },
+            },
+            {
+                paths: ['/:id'],
+                method: httpMethods.GET,
+                handler: getADocument,
+                responsePipeline: [
+                    { $match: {} },
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            createdAt: 1,
+                            updatedAt: 1,
+                        },
+                    },
+                ],
+            },
+            {
+                paths: ['/:id'],
+                method: httpMethods.PATCH,
+                handler: updateADocument,
+            },
+            {
+                paths: ['/:id'],
+                method: httpMethods.DELETE,
+                handler: deleteADocument,
+            },
+            {
+                paths: [
+                    '/',
+                    '/delete-list',
+                    '/delete-by-list',
+                    '/destroy-list',
+                    '/destroy-by-list',
+                ],
+                method: httpMethods.DELETE,
+                handler: deleteDocumentList,
+            },
+        ],
+    },
+
     products: {
         schema: {
             name: {

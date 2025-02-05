@@ -5,21 +5,84 @@ import logger from './src/lib/logger.js';
 
 import toSentenceCase from './src/utils/toSentenceCase.js';
 
+// Graceful shutdown function
+const initiateGracefulShutdown = async (reason, server, error = {}) => {
+    logger.warn(`Shutting down gracefully due to ${reason}: ${error}.`);
+
+    const shutdownTimeout = setTimeout(() => {
+        logger.error('Shutdown timed out, forcing shutdown.');
+        process.exit(1);
+    }, 30000);
+
+    try {
+        await new Promise((resolve, reject) => {
+            server.close((closeError) => {
+                clearTimeout(shutdownTimeout);
+
+                if (closeError) {
+                    logger.error(
+                        `Failed to close server: ${closeError.message}`
+                    );
+                    return reject(closeError);
+                }
+                logger.warn('Server successfully closed.');
+                resolve();
+            });
+        });
+
+        await mongodb.disconnect();
+        process.exit(0);
+    } catch (shutdownError) {
+        logger.error(`Shutdown failed: ${shutdownError.message}`);
+        process.exit(1);
+    }
+};
+
+// Unified error handler
+const handleCriticalError = async (type, error, server) => {
+    logger.error(`${type}: ${error.message}`, { stack: error.stack || 'N/A' });
+    await initiateGracefulShutdown(type, server, error);
+};
+
+// Handle process signals (SIGINT, SIGTERM)
+const shutdownHandler = async (signal, server) => {
+    logger.warn(`Received ${signal}, initiating shutdown...`);
+    await initiateGracefulShutdown(signal, server);
+};
+
+// Server startup function
 const startServer = async () => {
     try {
         await mongodb.connect();
 
         const port = configuration.port;
-        return app.listen(port, () => {
-            logger.info(
-                `${toSentenceCase(configuration.env)} server started on port ${port}`
-            );
+        const environment = toSentenceCase(configuration.env);
+
+        const server = app.listen(port, () => {
+            logger.info(`${environment} server started on port ${port}`);
         });
+
+        // Attach event listeners
+        server.on('error', (error) =>
+            handleCriticalError('Server Error', error, server)
+        );
+        process.on('uncaughtException', (error) =>
+            handleCriticalError('Uncaught Exception', error, server)
+        );
+        process.on('unhandledRejection', (error) =>
+            handleCriticalError('Unhandled Rejection', error, server)
+        );
+
+        process.on('SIGINT', () => shutdownHandler('SIGINT', server));
+        process.on('SIGTERM', () => shutdownHandler('SIGTERM', server));
     } catch (error) {
         logger.error('Failed to start the server:', error);
-
-        process.exit(1); // Exit the process with failure
+        process.exit(1);
     }
 };
 
-startServer();
+// ✅ **Ensuring the promise is handled properly**
+startServer().catch((error) => {
+    logger.error('Critical failure during server startup:', error);
+    process.exit(1);
+});

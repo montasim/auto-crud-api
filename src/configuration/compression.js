@@ -18,11 +18,11 @@ const compressionConfiguration = compression({
         const shouldCompress = compression.filter(req, res);
         if (shouldCompress) {
             logger.info(
-                `✅ Compression applied for request: ${req.method} ${req.originalUrl}`
+                `Compression applied for request: ${req.method} ${req.originalUrl}`
             );
         } else {
             logger.info(
-                `⚠️ Compression not applied due to content type for: ${req.method} ${req.originalUrl}`
+                `Compression not applied due to content type for: ${req.method} ${req.originalUrl}`
             );
         }
 
@@ -67,7 +67,7 @@ const measureCompressionSize = (req, res, next) => {
                 : 0;
 
         logger.info(
-            `📏 Compression Stats for ${req.method} ${req.originalUrl} | Original: ${originalSize} bytes | Compressed: ${compressedSize} bytes | Reduction: ${reductionPercentage.toFixed(2)}%`
+            `Compression Stats for ${req.method} ${req.originalUrl} | Original: ${originalSize} bytes | Compressed: ${compressedSize} bytes | Reduction: ${reductionPercentage.toFixed(2)}%`
         );
 
         originalEnd.apply(res, [chunk, ...args]);

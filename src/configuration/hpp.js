@@ -14,7 +14,7 @@ const hppConfiguration = (options) => {
         sensitiveParams.forEach(async (param) => {
             if (req.query[param] && Array.isArray(req.query[param])) {
                 const incidentDetails = {
-                    message: `⚠️ HTTP Parameter Pollution (HPP) attempt detected.`,
+                    message: `HTTP Parameter Pollution (HPP) attempt detected.`,
                     parameter: param,
                     values: req.query[param],
                     ip: req.ip,
@@ -24,7 +24,7 @@ const hppConfiguration = (options) => {
 
                 // Log the security warning
                 logger.warn(
-                    `⚠️ HPP Attempt: Suspicious repeated query parameter detected: '${param}'. Possible attack vector.`,
+                    `HPP Attempt: Suspicious repeated query parameter detected: '${param}'. Possible attack vector.`,
                     incidentDetails
                 );
 

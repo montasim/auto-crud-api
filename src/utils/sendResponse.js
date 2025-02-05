@@ -39,14 +39,14 @@ const sendResponse = (
     if (acceptEncoding.includes('gzip')) {
         zlib.gzip(jsonResponse, (err, compressed) => {
             if (err) {
-                logger.error('❌ Compression Error:', err);
+                logger.error('Compression Error:', err);
             }
             const compressedSize = compressed.length;
             const compressionRatio =
                 ((originalSize - compressedSize) / originalSize) * 100;
 
             logger.info(
-                `📏 Compression Stats: Original Size: ${originalSize} bytes | Compressed: ${compressedSize} bytes | Reduction: ${compressionRatio.toFixed(2)}%`
+                `Compression Stats: Original Size: ${originalSize} bytes | Compressed: ${compressedSize} bytes | Reduction: ${compressionRatio.toFixed(2)}%`
             );
 
             res.setHeader('Content-Encoding', 'gzip');

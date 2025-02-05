@@ -6,7 +6,7 @@ import sharedResponseTypes from '../utils/responseTypes.js';
 
 import sendResponse from '../utils/sendResponse.js';
 
-const validateInput = (schemas, rules) => (req, res, next) => {
+const validateInput = (req, res, next, schemas, rules) => {
     const validRequestContentType = rules?.request?.contentType?.trim();
 
     let validRequestContentTypeLowerCase = validRequestContentType;
@@ -23,6 +23,8 @@ const validateInput = (schemas, rules) => (req, res, next) => {
         const msg = `Unsupported Content-Type: '${validRequestContentType}'. Allowed values are: ${Object.values(contentTypes).join(', ')}.`;
         return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
     }
+
+    // ✅ Corrected: Extract the correct content type
     const requestContentType = req?.headers['content-type']
         ?.trim()
         .toLowerCase();

@@ -12,7 +12,7 @@ const cspViolationReport = async (req, res) => {
 
     if (!violationReport) {
         const msg =
-            '⚠️ Received a CSP violation report, but no details were provided.';
+            'Received a CSP violation report, but no details were provided.';
         responseTypes.BAD_REQUEST(req, res, {}, msg);
     }
 
@@ -26,7 +26,7 @@ const cspViolationReport = async (req, res) => {
     };
 
     // Log warning
-    logger.warn('⚠️ Helmet CSP Violation Detected!', reportData);
+    logger.warn('Helmet CSP Violation Detected!', reportData);
 
     // Save the violation to the database
     const savedReport = await CspViolation.create(reportData);

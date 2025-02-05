@@ -12,7 +12,7 @@ const hppIncidentReport = async (req, res) => {
 
     if (!parameter || !values || !ip) {
         const msg =
-            '⚠️ Received an HPP violation report, but some details are missing.';
+            'Received an HPP violation report, but some details are missing.';
         return responseTypes.BAD_REQUEST(req, res, {}, msg);
     }
 
@@ -25,7 +25,7 @@ const hppIncidentReport = async (req, res) => {
     };
 
     // Log warning
-    logger.warn('⚠️ HPP Violation Detected!', reportData);
+    logger.warn('HPP Violation Detected!', reportData);
 
     // Save to the database
     const savedReport = await HppViolation.create(reportData);

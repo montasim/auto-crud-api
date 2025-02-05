@@ -1,43 +1,50 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
+import logSymbols from 'log-symbols';
+import path from 'path';
 
-// Create a custom log format
+import configuration from '../configuration/configuration.js';
+import environments from '../constants/environments.js';
+
+// Define log directory
+const LOG_DIR = 'logs';
+
+// Function to map log levels to log symbols
+const logLevelToSymbol = {
+    info: logSymbols.success, // ✅
+    warn: logSymbols.warning, // ⚠️
+    error: logSymbols.error, // ❌
+    debug: logSymbols.info, // ℹ️
+};
+
+// Create a custom log format with log symbols
 const customFormat = winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // Improved timestamp format
     winston.format.printf(({ timestamp, level, message }) => {
-        return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+        const symbol = logLevelToSymbol[level] || logSymbols.info; // Default to ℹ️
+        return `${timestamp} [${level.toUpperCase()}] ${symbol} ${message}`;
     })
 );
 
-// Daily rotation transport for all logs
-const dailyRotateFileTransport = new winston.transports.DailyRotateFile({
-    dirname: 'logs', // Directory where log files will be saved
-    filename: 'combined-%DATE%.log', // Filename pattern with date placeholder
-    datePattern: 'YYYY-MM-DD', // Rotate daily
-    maxFiles: '30d', // Retain logs for 30 days
-    level: 'info', // Minimum log level for this file
-    format: customFormat,
-});
+// Create a function to configure daily rotated file transport
+const createDailyRotateTransport = (filename, level) =>
+    new winston.transports.DailyRotateFile({
+        dirname: LOG_DIR, // Directory where log files will be saved
+        filename: path.join(LOG_DIR, `${filename}-%DATE%.log`), // Include filename pattern with date
+        datePattern: 'YYYY-MM-DD', // Rotate daily
+        maxFiles: '30d', // Retain logs for 30 days
+        level, // Minimum log level for this file
+        format: customFormat,
+    });
 
-// Daily rotation transport specifically for errors
-const dailyRotateErrorFileTransport = new winston.transports.DailyRotateFile({
-    dirname: 'logs', // Directory where error log files will be saved
-    filename: 'errors-%DATE%.log', // Filename pattern for errors with date placeholder
-    datePattern: 'YYYY-MM-DD',
-    maxFiles: '30d',
-    level: 'error',
-    format: customFormat,
-});
-
+// Create logger instance
 const logger = winston.createLogger({
-    level: 'info',
+    level: configuration.env === environments.DEVELOPMENT ? 'debug' : 'info',
     format: customFormat, // Apply the custom format globally
     transports: [
-        new winston.transports.Console({
-            format: customFormat,
-        }),
-        dailyRotateFileTransport, // All logs with daily rotation
-        dailyRotateErrorFileTransport, // Error logs with daily rotation
+        new winston.transports.Console({ format: customFormat }), // Console logging with symbols
+        createDailyRotateTransport('combined', 'info'), // All logs with daily rotation
+        createDailyRotateTransport('errors', 'error'), // Error logs with daily rotation
     ],
 });
 

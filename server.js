@@ -1,3 +1,8 @@
+// IMPORTANT: Make sure to import `instrument.js` at the top of your file.
+import './instrument.mjs'; // Ensure profiling is set up correctly
+
+import * as Sentry from '@sentry/node';
+
 import mongodb from './src/lib/mongodb.js';
 import app from './src/app.js';
 import configuration from './src/configuration/configuration.js';
@@ -53,6 +58,9 @@ const shutdownHandler = async (signal, server) => {
 // Server startup function
 const startServer = async () => {
     try {
+        // The error handler must be registered before any other error middleware and after all controllers
+        Sentry.setupExpressErrorHandler(app);
+
         await mongodb.connect();
 
         const port = configuration.port;

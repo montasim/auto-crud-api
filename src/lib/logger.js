@@ -3,9 +3,6 @@ import 'winston-daily-rotate-file';
 import logSymbols from 'log-symbols';
 import path from 'path';
 
-import configuration from '../configuration/configuration.js';
-import environments from '../constants/environments.js';
-
 // Define log directory
 const LOG_DIR = 'logs';
 
@@ -39,7 +36,7 @@ const createDailyRotateTransport = (filename, level) =>
 
 // Create logger instance
 const logger = winston.createLogger({
-    level: configuration.env === environments.DEVELOPMENT ? 'debug' : 'info',
+    level: 'info',
     format: customFormat, // Apply the custom format globally
     transports: [
         new winston.transports.Console({ format: customFormat }), // Console logging with symbols

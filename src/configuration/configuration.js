@@ -137,6 +137,12 @@ const envSchema = z.object({
                     'CORS_ALLOWED_HEADERS must be a valid string of comma-separated values with valid characters.',
             }
         ),
+
+    SENTRY_ORG: z.string(),
+    SENTRY_PROJECT: z.string(),
+    SENTRY_TUNNEL_ROUTE: z.string(),
+    SENTRY_DSN: z.string(),
+    SENTRY_AUTH_TOKEN: z.string(),
 });
 
 // Validate the environment variables asynchronously.
@@ -173,6 +179,16 @@ const configuration = {
         allowedMethods: envVars.CORS_ALLOWED_METHODS,
         allowedOrigin: envVars.CORS_ALLOWED_ORIGIN,
         allowedHeaders: envVars.CORS_ALLOWED_HEADERS,
+    },
+
+    service: {
+        sentry: {
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            tunnelRoute: process.env.SENTRY_TUNNEL_ROUTE,
+            dsn: process.env.SENTRY_DSN,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+        },
     },
 
     routesConfig,

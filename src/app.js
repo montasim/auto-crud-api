@@ -108,6 +108,17 @@ app.use('/api/report/csp-violation', cspRoutes);
 app.use('/api/report/hpp-violation', hppRoutes);
 logger.debug('Violation reporting routes added.');
 
+app.get('/debug-sentry', (req, res, error) => {
+    throw new Error(error);
+});
+
+// Optional fallthrough error handler
+app.use((err, req, res, next) => {
+    // The error ID is attached to `res.sentry` to be returned
+    // and optionally displayed to the user for support.
+    res.status(500).end(`${res.sentry}\n`);
+});
+
 // Catch-all route for undefined routes
 app.all('*', (req, res) => {
     const msg = `Not Found: The route ${req.method} ${req.originalUrl} does not exist.`;

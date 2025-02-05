@@ -40,6 +40,8 @@ export default [
 
                 // Adds
                 URL: 'readonly',
+                setTimeout: 'readonly',
+                clearTimeout: 'readonly',
             },
         },
     },

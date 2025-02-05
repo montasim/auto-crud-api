@@ -182,7 +182,7 @@ Dummy data generation leverages Faker and RandExp to create valid records that c
 │   └── ...                       # Other library utilities.
 ├── utils
 │   ├── asyncHandler.js           # Async route handler wrapper.
-│   ├── validate.js               # Zod validation middleware.
+│   ├── validateInput.js               # Zod validation middleware.
 │   ├── toSentenceCase.js         # Utility to convert strings to sentence case.
 │   └── getIntValue.js            # Utility for parsing integer values.
 ├── index.js                      # Entry point for the Express application.

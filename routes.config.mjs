@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import { Schema, Types } from 'mongoose';
+import contentTypes from 'content-types-lite';
 
 import constants from './src/constants/constants.js';
 import httpMethods from './src/constants/httpMethods.js';
@@ -166,17 +166,13 @@ const routesConfig = {
                 paths: ['/', '/all', '/list'],
                 method: httpMethods.GET,
                 handler: getDocumentsList,
-                responsePipeline: [
-                    { $match: { isActive: true } },
-                    {
-                        $project: {
-                            _id: 1,
-                            name: 1,
-                            createdAt: 1,
-                            updatedAt: 1,
-                        },
+                rules: {
+                    request: {},
+                    response: {
+                        contentType: contentTypes.JSON,
+                        pipeline: [{ $match: { isActive: false } }],
                     },
-                ],
+                },
             },
             {
                 paths: ['/:id'],
@@ -299,7 +295,7 @@ const routesConfig = {
                 required: [true, 'User ID is required'],
                 validate: {
                     validator(v) {
-                        return mongoose.Types.ObjectId.isValid(v);
+                        return Types.ObjectId.isValid(v);
                     },
                     message: 'Invalid User ID format',
                 },
@@ -310,7 +306,7 @@ const routesConfig = {
                 required: [true, 'Product ID is required'],
                 validate: {
                     validator(v) {
-                        return mongoose.Types.ObjectId.isValid(v);
+                        return Types.ObjectId.isValid(v);
                     },
                     message: 'Invalid Product ID format',
                 },

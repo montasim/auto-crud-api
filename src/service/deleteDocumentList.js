@@ -1,3 +1,5 @@
+import contentTypes from 'content-types-lite';
+
 import schema from '../lib/schema.js';
 import sharedResponseTypes from '../utils/responseTypes.js';
 
@@ -9,15 +11,17 @@ const deleteDocumentList = async (
     modelNameInSentenceCase,
     getPopulatedDocument,
     referenceFields,
-    responsePipeline
+    rules
 ) => {
+    const contentType = rules?.response?.contentType || contentTypes.JSON;
+
     // Validate the request using Zod.
     const validationResult = schema.idsSchema.safeParse(req.query);
     if (!validationResult.success) {
         return sharedResponseTypes.BAD_REQUEST(
             req,
             res,
-            {},
+            contentType,
             `Bad Request: ${validationResult.error.errors[0].message}`
         );
     }
@@ -36,7 +40,7 @@ const deleteDocumentList = async (
         return sharedResponseTypes.NOT_FOUND(
             req,
             res,
-            {},
+            contentType,
             `Not Found: The following ${modelNameInSentenceCase} ${missingIds.length < 1 ? 'IDs do' : 'ID does'} not exist: ${missingIds.join(', ')}. Deletion aborted.`
         );
     }
@@ -44,7 +48,7 @@ const deleteDocumentList = async (
     // Delete all matching documents.
     await model.deleteMany({ _id: { $in: docIds } });
     const msg = `Success: ${modelNameInSentenceCase} with ${docIds.length < 1 ? 'IDs' : 'ID'}: ${docIds.join(', ')} deleted successfully.`;
-    return sharedResponseTypes.OK(req, res, {}, msg);
+    return sharedResponseTypes.OK(req, res, contentType, msg);
 };
 
 export default deleteDocumentList;

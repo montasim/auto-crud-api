@@ -2,11 +2,11 @@ import httpStatus from 'http-status-lite';
 
 import sendResponse from './sendResponse.js';
 
-const CREATED = (req, res, headers = {}, message, data = {}) =>
+const CREATED = (req, res, contentType = {}, message, data = {}) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.CREATED,
         true,
         message,
@@ -15,11 +15,11 @@ const CREATED = (req, res, headers = {}, message, data = {}) =>
         {}
     );
 
-const OK = (req, res, headers = {}, message, data = {}, pagination = {}) =>
+const OK = (req, res, contentType = {}, message, data = {}, pagination = {}) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.OK,
         true,
         message,
@@ -28,11 +28,11 @@ const OK = (req, res, headers = {}, message, data = {}, pagination = {}) =>
         {}
     );
 
-const NOT_FOUND = (req, res, headers = {}, message) =>
+const NOT_FOUND = (req, res, contentType = {}, message) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.NOT_FOUND,
         false,
         message,
@@ -41,11 +41,11 @@ const NOT_FOUND = (req, res, headers = {}, message) =>
         {}
     );
 
-const CONFLICT = (req, res, headers = {}, message) =>
+const CONFLICT = (req, res, contentType = {}, message) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.CONFLICT,
         false,
         message,
@@ -54,11 +54,11 @@ const CONFLICT = (req, res, headers = {}, message) =>
         {}
     );
 
-const BAD_REQUEST = (req, res, headers = {}, message) =>
+const BAD_REQUEST = (req, res, contentType = {}, message) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.BAD_REQUEST,
         false,
         message,
@@ -67,11 +67,11 @@ const BAD_REQUEST = (req, res, headers = {}, message) =>
         {}
     );
 
-const INTERNAL_SERVER_ERROR = (req, res, headers = {}, message) =>
+const INTERNAL_SERVER_ERROR = (req, res, contentType = {}, message) =>
     sendResponse(
         req,
         res,
-        headers,
+        contentType,
         httpStatus.INTERNAL_SERVER_ERROR,
         false,
         message,

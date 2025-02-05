@@ -1,3 +1,5 @@
+import contentTypes from 'content-types-lite';
+
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 const createDocument = async (
@@ -8,8 +10,11 @@ const createDocument = async (
     modelNameInSentenceCase,
     getPopulatedDocument,
     referenceFields,
-    responsePipeline
+    rules
 ) => {
+    const responsePipeline = rules?.response?.pipeline || [];
+    const contentType = rules?.response?.contentType || contentTypes.JSON;
+
     // 🔹 Check for uniqueness constraints before creation
     for (const field of uniqueFields) {
         if (req.body[field]) {
@@ -18,7 +23,7 @@ const createDocument = async (
             });
             if (existingDoc) {
                 const msg = `Conflict: ${modelNameInSentenceCase} with ${field} "${req.body[field]}" already exists.`;
-                return sharedResponseTypes.CONFLICT(req, res, {}, msg);
+                return sharedResponseTypes.CONFLICT(req, res, contentType, msg);
             }
         }
     }
@@ -31,17 +36,17 @@ const createDocument = async (
         const pipeline = [...responsePipeline];
 
         // Ensure filtering by _id
-        const matchIndex = pipeline.findIndex((stage) => stage.$match);
+        const matchIndex = responsePipeline.findIndex((stage) => stage.$match);
         if (matchIndex !== -1) {
             // Modify existing $match to include _id filtering
             pipeline[matchIndex].$match._id = doc._id;
         } else {
             // Prepend a new $match stage if none exists
-            pipeline.unshift({ $match: { _id: doc._id } });
+            responsePipeline.unshift({ $match: { _id: doc._id } });
         }
 
         // Execute aggregation pipeline
-        const aggregatedResult = await model.aggregate(pipeline);
+        const aggregatedResult = await model.aggregate(responsePipeline);
         doc = aggregatedResult.length ? aggregatedResult[0] : null;
     } else {
         // 🔹 Populate the document normally
@@ -50,11 +55,16 @@ const createDocument = async (
 
     if (!doc) {
         const msg = `Error: Failed to retrieve ${modelNameInSentenceCase} after creation.`;
-        return sharedResponseTypes.INTERNAL_SERVER_ERROR(req, res, {}, msg);
+        return sharedResponseTypes.INTERNAL_SERVER_ERROR(
+            req,
+            res,
+            contentType,
+            msg
+        );
     }
 
     const msg = `Success: New ${modelNameInSentenceCase} created with ID "${doc._id}".`;
-    return sharedResponseTypes.CREATED(req, res, {}, msg, doc);
+    return sharedResponseTypes.CREATED(req, res, contentType, msg, doc);
 };
 
 export default createDocument;

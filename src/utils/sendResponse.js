@@ -5,7 +5,7 @@ import logger from '../lib/logger.js';
 const sendResponse = (
     req,
     res,
-    headers,
+    contentType,
     status,
     success,
     message,
@@ -51,7 +51,7 @@ const sendResponse = (
 
             res.setHeader('Content-Encoding', 'gzip');
             res.setHeader('Content-Length', compressedSize);
-            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Type', contentType);
             res.status(status).end(compressed);
         });
     } else {

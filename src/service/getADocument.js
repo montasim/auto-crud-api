@@ -1,3 +1,5 @@
+import contentTypes from 'content-types-lite';
+
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 import convertToMongooseObjectId from '../utils/convertToMongooseObjectId.js';
@@ -10,8 +12,10 @@ const getADocument = async (
     modelNameInSentenceCase,
     getPopulatedDocument,
     referenceFields,
-    responsePipeline
+    rules
 ) => {
+    const responsePipeline = rules?.response?.pipeline || [];
+    const contentType = rules?.response?.contentType || contentTypes.JSON;
     const docId = convertToMongooseObjectId(req.params.id);
     let doc = {};
 
@@ -38,14 +42,14 @@ const getADocument = async (
 
     if (!doc || (Array.isArray(doc) && doc.length === 0)) {
         const msg = `Not Found: ${modelNameInSentenceCase} with ID "${docId}" does not exist.`;
-        return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
+        return sharedResponseTypes.NOT_FOUND(req, res, contentType, msg);
     }
 
     const msg = `Success: ${modelNameInSentenceCase} with ID "${docId}" fetched with populated references.`;
     return sharedResponseTypes.OK(
         req,
         res,
-        {},
+        contentType,
         msg,
         Array.isArray(doc) ? doc[0] : doc
     );

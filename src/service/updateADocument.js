@@ -1,3 +1,5 @@
+import contentTypes from 'content-types-lite';
+
 import sharedResponseTypes from '../utils/responseTypes.js';
 
 const updateADocument = async (
@@ -8,15 +10,17 @@ const updateADocument = async (
     modelNameInSentenceCase,
     getPopulatedDocument,
     referenceFields,
-    responsePipeline
+    rules
 ) => {
+    const responsePipeline = rules?.response?.pipeline || [];
+    const contentType = rules?.response?.contentType || contentTypes.JSON;
     const docId = req.params.id;
 
     // 🔹 Ensure the document exists before updating
     const existingDoc = await model.findById(docId);
     if (!existingDoc) {
         const msg = `Not Found: ${modelNameInSentenceCase} with ID "${docId}" does not exist.`;
-        return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
+        return sharedResponseTypes.NOT_FOUND(req, res, contentType, msg);
     }
 
     // 🔹 Check uniqueness constraints before updating
@@ -28,7 +32,7 @@ const updateADocument = async (
 
             if (conflictingDoc && conflictingDoc._id.toString() !== docId) {
                 const msg = `Conflict: ${modelNameInSentenceCase} with ${field} "${req.body[field]}" already exists.`;
-                return sharedResponseTypes.CONFLICT(req, res, {}, msg);
+                return sharedResponseTypes.CONFLICT(req, res, contentType, msg);
             }
         }
     }
@@ -61,11 +65,11 @@ const updateADocument = async (
 
     if (!updatedDoc) {
         const msg = `Not Found: ${modelNameInSentenceCase} with ID "${docId}" does not exist after update.`;
-        return sharedResponseTypes.NOT_FOUND(req, res, {}, msg);
+        return sharedResponseTypes.NOT_FOUND(req, res, contentType, msg);
     }
 
     const msg = `Success: ${modelNameInSentenceCase} updated with ID "${docId}".`;
-    return sharedResponseTypes.OK(req, res, {}, msg, updatedDoc);
+    return sharedResponseTypes.OK(req, res, contentType, msg, updatedDoc);
 };
 
 export default updateADocument;

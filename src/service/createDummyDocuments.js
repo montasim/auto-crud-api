@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import RandExp from 'randexp';
 import { Types } from 'mongoose';
+import contentTypes from 'content-types-lite';
 
 import sharedResponseTypes from '../utils/responseTypes.js';
 
@@ -154,15 +155,17 @@ const createDummyDocuments = async (
     modelNameInSentenceCase,
     getPopulatedDocument,
     referenceFields,
-    responsePipeline
+    rules
 ) => {
+    const responsePipeline = rules?.response?.pipeline || [];
+    const contentType = rules?.response?.contentType || contentTypes.JSON;
     const { count = 1 } = req.query;
     const parsedCount = getIntValue(count);
 
     // 🔹 Validate 'count' parameter
     if (isNaN(parsedCount) || parsedCount <= 0) {
         const msg = `Bad Request: The "count" parameter must be a positive integer.`;
-        return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
+        return sharedResponseTypes.BAD_REQUEST(req, res, contentType, msg);
     }
 
     // 🔹 Generate dummy data based on the model schema
@@ -197,7 +200,7 @@ const createDummyDocuments = async (
     }
 
     const msg = `Success: ${parsedCount} ${modelNameInSentenceCase}${parsedCount !== 1 ? 's' : ''} created with dummy data.`;
-    return sharedResponseTypes.CREATED(req, res, {}, msg, finalDocs);
+    return sharedResponseTypes.CREATED(req, res, contentType, msg, finalDocs);
 };
 
 export default createDummyDocuments;

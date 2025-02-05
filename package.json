@@ -1,8 +1,36 @@
 {
   "name": "auto-crud-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Dynamically creates Mongoose models, Zod schemas, and Express routes based on predefined schema definitions. Also supports dummy data generation for testing purposes.",
+  "main": "server.js",
   "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=23.x",
+    "npm": ">=10.x"
+  },
+  "repository": "https://github.com/montasim/auto-crud-api",
+  "homepage": "https://github.com/montasim/auto-crud-api/",
+  "issues": "https://github.com/montasim/auto-crud-api/issues",
+  "bugs": "https://github.com/montasim/auto-crud-api/bugs",
+  "termsOfService": "https://github.com/montasim/auto-crud-api/terms-of-service",
+  "documentation": {
+    "docs": "https://github.com/montasim/auto-crud-api/docs",
+    "swagger": "https://github.com/montasim/auto-crud-api/docs",
+    "tutorials": "https://github.com/montasim/auto-crud-api/tutorials"
+  },
+  "author": {
+    "name": "Mohammad Montasim -Al- Mamun Shuvo",
+    "portfolio": "https://montasim-dev.web.app/",
+    "contact": {
+      "email": "montasimmamun@gmail.com",
+      "mobile": "+8801722815469"
+    },
+    "social": {
+      "linkedIn": "https://www.linkedin.com/in/montasim",
+      "gitHub": "https://github.com/montasim"
+    }
+  },
   "scripts": {
     "start": "node ./build/server.js",
     "dev": "nodemon server.js",
@@ -20,14 +48,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
   "license": "CC BY-NC-ND 4.0",
-  "description": "",
   "dependencies": {
     "@faker-js/faker": "^9.4.0",
     "axios": "^1.7.9",
     "compression": "^1.7.5",
-    "content-types-lite": "^0.1.1",
+    "content-types-lite": "^0.1.2",
     "cors": "^2.8.5",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",

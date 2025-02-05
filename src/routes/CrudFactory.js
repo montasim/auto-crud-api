@@ -1,7 +1,7 @@
 import express from 'express';
 
 import asyncHandler from '../utils/asyncHandler.js';
-import validate from '../utils/validate.js';
+import validateInput from '../middlewares/validateInput.js';
 import toSentenceCase from '../utils/toSentenceCase.js';
 
 const createCrudRoutes = (modelName, model, zodSchema, routes) => {
@@ -22,18 +22,12 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
         model.findById(documentId).populate(referenceFields);
 
     routes.forEach(
-        ({
-            paths,
-            method,
-            handler,
-            dataValidation = true,
-            responsePipeline,
-        }) => {
+        ({ paths, method, handler, dataValidation = true, rules }) => {
             paths.forEach((path) => {
                 const middleware = [];
 
                 if (dataValidation) {
-                    middleware.push(validate(zodSchema));
+                    middleware.push(validateInput(zodSchema, rules));
                 }
 
                 middleware.push(
@@ -46,7 +40,7 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
                             modelNameInSentenceCase,
                             getPopulatedDocument,
                             referenceFields,
-                            responsePipeline
+                            rules
                         );
                     })
                 );

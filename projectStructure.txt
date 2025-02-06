@@ -1,0 +1,42 @@
+E:\PERSONAL\PROJECTS\auto-crud-api
+├── .dockerignore
+├── .env
+├── .gitignore
+├── .idea
+|  ├── .gitignore
+|  ├── auto-crud-api.iml
+|  ├── codeStyles
+|  ├── inspectionProfiles
+|  ├── modules.xml
+|  ├── prettier.xml
+|  ├── vcs.xml
+|  └── workspace.xml
+├── .prettierignore
+├── .prettierrc
+├── Dockerfile
+├── eslint.config.mjs
+├── instrument.mjs
+├── package-lock.json
+├── package.json
+├── README.md
+├── routes
+├── routes.config.mjs
+├── server.js
+├── src
+|  ├── app.js
+|  ├── configuration
+|  ├── constants
+|  ├── lib
+|  ├── middlewares
+|  ├── models
+|  ├── modules
+|  ├── routes
+|  ├── rules
+|  ├── service
+|  ├── utils
+|  └── validators
+├── terser.js
+└── terserrc.json
+
+directory: 22 file: 30
+

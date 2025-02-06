@@ -168,26 +168,44 @@ Dummy data generation leverages Faker and RandExp to create valid records that c
 
 ```plaintext
 .
-├── src
-│   ├── constants
-│   │   └── constants.js          # Contains regex and other constant values.
-│   ├── models                    # (Optional) Custom models if needed.
-│   ├── routes                    # Dynamic CRUD routes are generated here.
-│   └── schema                    # Schema definitions and dynamic creation logic.
-│       ├── createMongooseModel.js# Helper to create Mongoose models.
-│       └── createZodSchemas.js   # Helper to create Zod validation schemas.
-├── lib
-│   ├── logger.js                 # Logging utility.
-│   ├── schema.js                 # Additional schema utilities.
-│   └── ...                       # Other library utilities.
-├── utils
-│   ├── asyncHandler.js           # Async route handler wrapper.
-│   ├── validateInput.js               # Zod validation middleware.
-│   ├── toSentenceCase.js         # Utility to convert strings to sentence case.
-│   └── getIntValue.js            # Utility for parsing integer values.
-├── index.js                      # Entry point for the Express application.
+├── .dockerignore
+├── .env
+├── .gitignore
+├── .idea
+|  ├── .gitignore
+|  ├── auto-crud-api.iml
+|  ├── codeStyles
+|  ├── inspectionProfiles
+|  ├── modules.xml
+|  ├── prettier.xml
+|  ├── vcs.xml
+|  └── workspace.xml
+├── .prettierignore
+├── .prettierrc
+├── Dockerfile
+├── eslint.config.mjs
+├── instrument.mjs
+├── package-lock.json
 ├── package.json
-└── README.md
+├── README.md
+├── routes
+├── routes.config.mjs
+├── server.js
+├── src
+|  ├── app.js
+|  ├── configuration
+|  ├── constants
+|  ├── lib
+|  ├── middlewares
+|  ├── models
+|  ├── modules
+|  ├── routes
+|  ├── rules
+|  ├── service
+|  ├── utils
+|  └── validators
+├── terser.js
+└── terserrc.json
 ```
 
 ---

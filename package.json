@@ -35,6 +35,7 @@
     "start": "pm2 start ./build/server.js --watch --ignore-watch=\"node_modules\"",
     "restart": "pm2 restart server",
     "dev": "nodemon server.js",
+    "generate:project:structure": "treee --ignore 'node_modules/, .git/, .idea/, logs/' -l 2 -o projectStructure.txt -a",
     "eslint:check": "eslint .",
     "eslint:fix": "eslint . --fix",
     "prettier:check": "prettier . --check",

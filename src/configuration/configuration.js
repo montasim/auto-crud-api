@@ -1,40 +1,15 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
-import axios from 'axios';
 
 import environments from '../constants/environments.js';
 import httpMethods from '../constants/httpMethods.js';
-import logger from '../lib/logger.js';
-
 import routesConfig from '../../routes.config.mjs';
+
+import isUrlReachable from '../utils/isUrlReachable.js';
 
 import { EnvironmentVariableError } from '../lib/customErrors.js';
 
 dotenv.config();
-
-// Helper function to check if a URL is reachable
-const checkUrlExists = async (url) => {
-    try {
-        await axios.get(url); // Perform a GET request to the URL
-        return true; // If successful, return true
-    } catch (error) {
-        let errorMessage = `URL Check Failed: Unable to reach ${url}. `;
-
-        if (error.response) {
-            // Server responded with a status code outside of 2xx
-            errorMessage += `Received status code ${error.response.status}.`;
-        } else if (error.request) {
-            // Request was made, but no response received
-            errorMessage += 'No response received from the server.';
-        } else {
-            // Something went wrong setting up the request
-            errorMessage += `Request setup error: ${error.message}`;
-        }
-
-        logger.error(errorMessage, { url, error: error.toString() });
-        return false; // If there's an error, return false (URL is not reachable)
-    }
-};
 
 // Define a Zod schema for the required environment variables.
 const envSchema = z.object({
@@ -109,7 +84,7 @@ const envSchema = z.object({
                         } else {
                             try {
                                 new URL(origin); // Validate URL structure
-                                return await checkUrlExists(origin); // Check if the URL exists
+                                return await isUrlReachable(origin); // Check if the URL exists
                             } catch {
                                 return false; // Invalid URL format
                             }
@@ -146,21 +121,21 @@ const envSchema = z.object({
 });
 
 // Validate the environment variables asynchronously.
-// If validation fails, throw a EnvironmentVariableError with a descriptive message.
+// If validation fails, throw an EnvironmentVariableError with a descriptive message.
 let envVars;
 try {
     envVars = await envSchema.parseAsync(process.env); // Use parseAsync for asynchronous validation
 } catch (error) {
     if (error instanceof z.ZodError) {
-        // Combine all error messages into a single string.
+        // Combine all error messages with their corresponding variable names.
         const combinedErrors = error.errors
-            .map((err) => err.message)
+            .map((err) => `${err.path.join('.')} - ${err.message}`)
             .join(', ');
         throw new EnvironmentVariableError(
             `Critical configuration error: ${combinedErrors}`
         );
     }
-    throw error; // Rethrow non-Zod errors.
+    throw error;
 }
 
 // Build the configuration object.

@@ -26,9 +26,7 @@ import cspViolationReport from './service/cspViolationReport.js';
 
 import configuration from './configuration/configuration.js';
 
-import createMongooseModel from './models/SchemaFactory.js';
-import createZodSchema from './validators/ZodFactory.js';
-import createCrudRoutes from './routes/CrudFactory.js';
+import initializeRoutes from './modules/routeInitializer.js';
 
 const app = express();
 
@@ -36,6 +34,8 @@ const app = express();
 logger.debug('Initializing security middleware...');
 app.use(helmet(helmetConfiguration));
 app.use(cors(corsConfiguration));
+// ✅ Apply the Site Identifier check globally
+// app.use(corsConfiguration.checkAuthorizationIdentifierHeader);
 app.use(hppConfiguration());
 app.use(measureCompressionSize);
 app.use(compressionConfiguration);
@@ -74,32 +74,7 @@ logger.debug('Swagger API documentation available at /api/docs');
 
 // ✅ Dynamically create models, validators, and routes
 logger.debug('Initializing dynamic route creation...');
-Object.entries(configuration.routesConfig).forEach(
-    ([name, { schema, routes }]) => {
-        logger.info(`Creating routes for: ${name}`);
-
-        if (!Array.isArray(routes)) {
-            logger.error(
-                `Error: "routes" must be an array in ${name}, but received ${typeof routes}`
-            );
-            return;
-        }
-
-        const model = createMongooseModel(name, schema);
-        const zodSchema = createZodSchema(name, schema);
-        const router = createCrudRoutes(name, model, zodSchema, routes);
-
-        routes.forEach(({ paths, method }) => {
-            paths.forEach((path) => {
-                logger.debug(
-                    `Route Created: [${method.toUpperCase()}] /api/${name}${path}`
-                );
-            });
-        });
-
-        app.use(`/api/${name}`, router);
-    }
-);
+initializeRoutes(app, configuration);
 logger.debug('Dynamic route creation completed.');
 
 // ✅ Attach CSP Violation Routes

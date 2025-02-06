@@ -80,6 +80,19 @@ const INTERNAL_SERVER_ERROR = (req, res, contentType = {}, message) =>
         {}
     );
 
+const UNSUPPORTED_MEDIA_TYPE = (req, res, contentType = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        contentType,
+        httpStatus.UNSUPPORTED_MEDIA_TYPE,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
+
 const responseTypes = {
     CREATED,
     OK,
@@ -87,6 +100,7 @@ const responseTypes = {
     CONFLICT,
     BAD_REQUEST,
     INTERNAL_SERVER_ERROR,
+    UNSUPPORTED_MEDIA_TYPE,
 };
 
 export default responseTypes;

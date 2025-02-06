@@ -1,6 +1,7 @@
 'use strict';
 
 import httpStatus from 'http-status-lite';
+
 import configuration from './configuration.js';
 import logger from '../lib/logger.js';
 
@@ -9,6 +10,7 @@ import { ConfigurationError } from '../lib/customErrors.js';
 const whitelist = Array.isArray(configuration.cors.allowedOrigin)
     ? configuration.cors.allowedOrigin
     : [];
+const authorizationIdentifierHeader = 'X-Site-Identifier';
 
 const corsConfiguration = {
     origin: (origin, callback) => {
@@ -20,7 +22,6 @@ const corsConfiguration = {
             logger.error(msg, {
                 origin,
                 allowedOrigins: whitelist,
-                timestamp: new Date().toISOString(),
             });
 
             callback(new ConfigurationError(msg), false); // Return explicit false for better debugging
@@ -30,8 +31,29 @@ const corsConfiguration = {
     methods: configuration.cors.allowedMethods,
     allowedHeaders: configuration.cors.allowedHeaders,
     credentials: true, // This allows the server to send cookies
-    preflightContinue: false,
+    preflightContinue: true, // Let middleware handle OPTIONS requests too
     maxAge: 24 * 60 * 60, // 24 hours
+
+    // Middleware for identifier validation
+    checkAuthorizationIdentifierHeader: (req, res, next) => {
+        const siteIdentifier =
+            req.headers[authorizationIdentifierHeader.toLowerCase()];
+
+        if (!siteIdentifier) {
+            const errorMsg = `Missing '${authorizationIdentifierHeader}' header in the request.`;
+            logger.error(errorMsg, {
+                method: req.method,
+                url: req.originalUrl,
+            });
+
+            return res.status(httpStatus.FORBIDDEN).json({
+                error: errorMsg,
+                errorCode: 'MISSING_IDENTIFIER_HEADER',
+            });
+        }
+
+        next();
+    },
 };
 
 export default corsConfiguration;

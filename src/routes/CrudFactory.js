@@ -1,8 +1,10 @@
 import express from 'express';
 
-import asyncHandler from '../utils/asyncHandler.js';
-import validateInput from '../middlewares/validateInput.js';
 import toSentenceCase from '../utils/toSentenceCase.js';
+import validateContentType from '../middlewares/validateContentType.js';
+import validateInput from '../middlewares/validateInput.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import validateRequestBody from '../middlewares/validateRequestBody.js';
 
 const createCrudRoutes = (modelName, model, zodSchema, routes) => {
     const router = express.Router();
@@ -20,18 +22,40 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
 
     const getPopulatedDocument = async (documentId) =>
         model.findById(documentId).populate(referenceFields);
+    const methodsThatRequireBody = ['POST', 'PUT', 'PATCH'];
 
     routes.forEach(
         ({ paths, method, handler, dataValidation = true, rules }) => {
             paths.forEach((path) => {
                 const middleware = [];
 
+                // ✅ Content-Type Validation
+                if (rules?.request?.contentType) {
+                    middleware.push((req, res, next) =>
+                        validateContentType(
+                            req,
+                            res,
+                            next,
+                            rules.request.contentType
+                        )
+                    );
+                }
+
+                // ✅ Request Body Validation
+                if (dataValidation && methodsThatRequireBody.includes(method)) {
+                    middleware.push((req, res, next) =>
+                        validateRequestBody(req, res, next)
+                    );
+                }
+
+                // ✅ Data Validation
                 if (dataValidation) {
                     middleware.push((req, res, next) =>
                         validateInput(req, res, next, zodSchema, rules)
                     );
                 }
 
+                // ✅ Handler
                 middleware.push(
                     asyncHandler((req, res) => {
                         return handler(
@@ -41,8 +65,7 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
                             uniqueFields,
                             modelNameInSentenceCase,
                             getPopulatedDocument,
-                            referenceFields,
-                            rules
+                            referenceFields
                         );
                     })
                 );

@@ -161,6 +161,11 @@ const routesConfig = {
                 paths: ['/'],
                 method: httpMethods.POST,
                 handler: createDocument,
+                rules: {
+                    request: {
+                        contentType: contentTypes.JSON,
+                    },
+                },
             },
             {
                 paths: ['/', '/all', '/list'],
@@ -170,7 +175,7 @@ const routesConfig = {
                     request: {},
                     response: {
                         contentType: contentTypes.JSON,
-                        pipeline: [{ $match: { isActive: false } }],
+                        pipeline: [],
                     },
                 },
             },
@@ -194,6 +199,11 @@ const routesConfig = {
                 paths: ['/:id'],
                 method: httpMethods.PATCH,
                 handler: updateADocument,
+                rules: {
+                    request: {
+                        contentType: contentTypes.JSON,
+                    },
+                },
             },
             {
                 paths: ['/:id'],

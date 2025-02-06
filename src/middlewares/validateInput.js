@@ -1,39 +1,10 @@
 import httpStatus from 'http-status-lite';
-import contentTypes from 'content-types-lite';
 
 import httpMethods from '../constants/httpMethods.js';
-import sharedResponseTypes from '../utils/responseTypes.js';
 
 import sendResponse from '../utils/sendResponse.js';
 
-const validateInput = (req, res, next, schemas, rules) => {
-    const validRequestContentType = rules?.request?.contentType?.trim();
-
-    let validRequestContentTypeLowerCase = validRequestContentType;
-    if (validRequestContentType) {
-        validRequestContentTypeLowerCase =
-            validRequestContentType.toLowerCase();
-    }
-
-    // Ensure the content type is valid
-    if (
-        validRequestContentTypeLowerCase &&
-        !Object.values(contentTypes).includes(validRequestContentTypeLowerCase)
-    ) {
-        const msg = `Unsupported Content-Type: '${validRequestContentType}'. Allowed values are: ${Object.values(contentTypes).join(', ')}.`;
-        return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
-    }
-
-    // ✅ Corrected: Extract the correct content type
-    const requestContentType = req?.headers['content-type']
-        ?.trim()
-        .toLowerCase();
-
-    if (validRequestContentTypeLowerCase !== requestContentType) {
-        const msg = `Invalid Content-Type: Expected "${validRequestContentTypeLowerCase}", but received "${requestContentType}".`;
-        return sharedResponseTypes.BAD_REQUEST(req, res, {}, msg);
-    }
-
+const validateInput = (req, res, next, schemas) => {
     let schema;
 
     switch (req.method) {

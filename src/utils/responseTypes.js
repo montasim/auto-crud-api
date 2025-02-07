@@ -93,6 +93,19 @@ const UNSUPPORTED_MEDIA_TYPE = (req, res, contentType = {}, message) =>
         {}
     );
 
+const TOO_MANY_REQUESTS = (req, res, contentType = {}, message) =>
+    sendResponse(
+        req,
+        res,
+        contentType,
+        httpStatus.TOO_MANY_REQUESTS,
+        false,
+        message,
+        {},
+        {},
+        {}
+    );
+
 const responseTypes = {
     CREATED,
     OK,
@@ -101,6 +114,7 @@ const responseTypes = {
     BAD_REQUEST,
     INTERNAL_SERVER_ERROR,
     UNSUPPORTED_MEDIA_TYPE,
+    TOO_MANY_REQUESTS,
 };
 
 export default responseTypes;

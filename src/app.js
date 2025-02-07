@@ -16,6 +16,7 @@ import {
     compressionConfiguration,
     measureCompressionSize,
 } from './configuration/compression.js';
+import rateLimiter from './configuration/rateLimiter.js';
 import morganConfiguration from './configuration/morgan.js';
 import sanitizeRequestConfiguration from './configuration/sanitizeRequest.js';
 import swaggerConfiguration from './configuration/swagger.js';
@@ -37,6 +38,12 @@ app.use(cors(corsConfiguration));
 app.use(hppConfiguration());
 app.use(measureCompressionSize);
 app.use(compressionConfiguration);
+logger.debug('Security middleware initialized.');
+
+// ✅ Rate Limiter to protect against brute-force attacks and abuse
+logger.debug('Applying rate limiting...');
+app.use(rateLimiter);
+logger.debug('Rate limiting enabled.');
 logger.debug('Security middleware initialized.');
 
 // Morgan HTTP request logger setup

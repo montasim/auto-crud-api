@@ -22,8 +22,6 @@ const createDefaultAdmin = async () => {
             hashedPassword,
         });
 
-        console.log(result);
-
         if (!result) {
             logger.info(`Default admin user created with email: ${email}`);
         } else {

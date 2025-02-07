@@ -24,8 +24,6 @@ import cspRoutes from './routes/CspRoutes.js';
 import hppRoutes from './routes/HppRoutes.js';
 import cspViolationReport from './service/cspViolationReport.js';
 
-import configuration from './configuration/configuration.js';
-
 import initializeRoutes from './modules/routeInitializer.js';
 
 const app = express();
@@ -74,7 +72,7 @@ logger.debug('Swagger API documentation available at /api/docs');
 
 // ✅ Dynamically create models, validators, and routes
 logger.debug('Initializing dynamic route creation...');
-initializeRoutes(app, configuration);
+initializeRoutes(app);
 logger.debug('Dynamic route creation completed.');
 
 // ✅ Attach CSP Violation Routes

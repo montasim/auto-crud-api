@@ -82,7 +82,7 @@ const asyncHandler = (fn) => {
                     error.message ||
                     'An unexpected error occurred on the server.';
                 errorDetails =
-                    configuration.env === environments.PRODUCTION
+                    configuration.app.environment === environments.PRODUCTION
                         ? undefined
                         : error.stack;
                 logger.error(`Server Error: ${message}`, errorDetails);

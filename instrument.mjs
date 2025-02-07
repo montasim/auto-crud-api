@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/node';
 import configuration from './src/configuration/configuration.js';
 
 Sentry.init({
-    dsn: configuration.service.sentry.dsn,
+    dsn: configuration.sentryService.dsn,
     integrations: [
         // nodeProfilingIntegration(),
     ],

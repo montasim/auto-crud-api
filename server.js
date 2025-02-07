@@ -63,8 +63,8 @@ const startServer = async () => {
 
         await mongodb.connect();
 
-        const port = configuration.port;
-        const environment = toSentenceCase(configuration.env);
+        const port = configuration.server.port;
+        const environment = toSentenceCase(configuration.app.environment);
 
         const server = app.listen(port, () => {
             logger.info(`${environment} server started on port ${port}`);

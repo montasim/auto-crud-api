@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import logger from './logger.js';
 import configuration from '../configuration/configuration.js';
 
-const mongodbConnectionUri = configuration.database.mongodb.connectionUri;
+const mongodbConnectionUri = configuration.database.mongodb.uri;
 
 // Function to handle reconnection logic
 const handleReconnection = async () => {

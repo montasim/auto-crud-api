@@ -5,9 +5,10 @@ import createCrudRoutes from '../routes/CrudFactory.js';
 import defaultRules from '../rules/defaultRules.js';
 import httpMethods from '../constants/httpMethods.js';
 import logger from '../lib/logger.js';
+import configuration from '../configuration/configuration.js';
 
-const initializeRoutes = (app, configuration) => {
-    Object.entries(configuration.routesConfig).forEach(
+const initializeRoutes = (app) => {
+    Object.entries(configuration.routes).forEach(
         ([name, { schema, routes }]) => {
             logger.info(`Creating routes for: ${name}`);
 

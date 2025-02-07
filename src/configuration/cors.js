@@ -7,8 +7,8 @@ import logger from '../lib/logger.js';
 
 import { ConfigurationError } from '../lib/customErrors.js';
 
-const whitelist = Array.isArray(configuration.cors.allowedOrigin)
-    ? configuration.cors.allowedOrigin
+const whitelist = Array.isArray(configuration.cors.allowedOrigins)
+    ? configuration.cors.allowedOrigins
     : [];
 const authorizationIdentifierHeader = 'X-Site-Identifier';
 

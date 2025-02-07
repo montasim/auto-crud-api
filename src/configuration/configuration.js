@@ -75,7 +75,19 @@ const toBoolean = z.preprocess((val) => {
 }, z.boolean());
 
 // --- 2. Reusable Number Preprocessing ---
-const toNumber = (schema) => z.preprocess((val) => Number(val), schema);
+const toNumber = (schema) => z.preprocess((val) => {
+    if (typeof val === 'number') {
+        return val;
+    }
+    if (typeof val === 'string') {
+        const num = Number(val);
+        if (!isNaN(num)) {
+            return num;
+        }
+    }
+    return val; // Return original if conversion fails
+}, z.any()).pipe(schema);
+
 
 // --- 3. Centralized String Splitting and Trimming ---
 const splitAndTrimString = (schema) =>

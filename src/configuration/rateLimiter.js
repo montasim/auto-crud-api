@@ -8,7 +8,7 @@ import responseTypes from '../utils/responseTypes.js';
 
 const rateLimiter = rateLimit({
     windowMs: configuration.auth.rateLimit.windowMs,
-    max: configuration.auth.rateLimit.max,
+    max: configuration.auth.rateLimit.maxRequestsPerWindow,
     message:
         'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers

@@ -9,6 +9,8 @@ import configuration from './src/configuration/configuration.js';
 import logger from './src/lib/logger.js';
 
 import toSentenceCase from './src/utils/toSentenceCase.js';
+import asyncHandler from './src/utils/asyncHandler.js';
+import createDefaultAdmin from './src/service/createDefaultAdmin.js';
 
 // Graceful shutdown function
 const initiateGracefulShutdown = async (reason, server, error = {}) => {
@@ -62,6 +64,7 @@ const startServer = async () => {
         Sentry.setupExpressErrorHandler(app);
 
         await mongodb.connect();
+        asyncHandler(createDefaultAdmin());
 
         const port = configuration.server.port;
         const environment = toSentenceCase(configuration.app.environment);

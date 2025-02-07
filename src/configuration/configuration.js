@@ -415,6 +415,9 @@ const envSchema = z.object({
     SYSTEM_ADMIN_NAME: z.string({
         required_error: 'SYSTEM_ADMIN_NAME is required.',
     }),
+    SYSTEM_ADMIN_PASSWORD: z.string({
+        required_error: 'SYSTEM_ADMIN_PASSWORD is required.',
+    }),
 
     // System - Debugging
     SYSTEM_DEBUG_LOG_LEVEL: z.string({
@@ -667,10 +670,11 @@ const configuration = {
             currency: envVars.SYSTEM_CURRENCY,
             countryCode: envVars.SYSTEM_COUNTRY_CODE, // More descriptive
         },
-        adminContact: {
+        admin: {
             // Grouping admin contact settings
             email: envVars.SYSTEM_ADMIN_EMAIL,
             name: envVars.SYSTEM_ADMIN_NAME,
+            password: envVars.SYSTEM_ADMIN_PASSWORD,
         },
         debug: {
             // Grouping debug settings
@@ -725,6 +729,7 @@ const configuration = {
         dsn: envVars.SENTRY_DSN,
         authToken: envVars.SENTRY_AUTH_TOKEN,
     },
+
     routes: routesConfig, // Kept as is, assuming it's route configurations
 };
 

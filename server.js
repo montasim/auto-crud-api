@@ -2,6 +2,8 @@
 import './instrument.mjs'; // Ensure profiling is set up correctly
 
 import * as Sentry from '@sentry/node';
+import fs from 'fs';
+import https from 'https';
 
 import mongodb from './src/lib/mongodb.js';
 import app from './src/app.js';
@@ -64,16 +66,36 @@ const startServer = async () => {
         Sentry.setupExpressErrorHandler(app);
 
         await mongodb.connect();
+        // Fire-and-forget creating the default admin (if needed)
         asyncHandler(createDefaultAdmin());
 
         const port = configuration.server.port;
         const environment = toSentenceCase(configuration.app.environment);
+        const isProduction = process.env.NODE_ENV === 'production';
 
-        const server = app.listen(port, () => {
-            logger.info(`${environment} server started on port ${port}`);
-        });
+        let server;
 
-        // Attach event listeners
+        // Create an HTTPS server if in production and SSL credentials are provided,
+        // otherwise create an HTTP server.
+        if (isProduction && process.env.SSL_KEY && process.env.SSL_CERT) {
+            const sslOptions = {
+                key: fs.readFileSync(process.env.SSL_KEY),
+                cert: fs.readFileSync(process.env.SSL_CERT),
+            };
+            server = https.createServer(sslOptions, app).listen(port, () => {
+                logger.info(
+                    `HTTPS Server running with ${environment} configuration on port ${port}`
+                );
+            });
+        } else {
+            server = app.listen(port, () => {
+                logger.info(
+                    `HTTP Server running with ${environment} configuration on port ${port}`
+                );
+            });
+        }
+
+        // Attach event listeners to handle errors and process signals
         server.on('error', (error) =>
             handleCriticalError('Server Error', error, server)
         );

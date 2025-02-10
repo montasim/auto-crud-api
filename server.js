@@ -71,13 +71,16 @@ const startServer = async () => {
 
         const port = configuration.server.port;
         const environment = toSentenceCase(configuration.app.environment);
-        const isProduction = process.env.NODE_ENV === 'production';
 
         let server;
 
         // Create an HTTPS server if in production and SSL credentials are provided,
         // otherwise create an HTTP server.
-        if (isProduction && process.env.SSL_KEY && process.env.SSL_CERT) {
+        if (
+            configuration.app.isProduction &&
+            process.env.SSL_KEY &&
+            process.env.SSL_CERT
+        ) {
             const sslOptions = {
                 key: fs.readFileSync(process.env.SSL_KEY),
                 cert: fs.readFileSync(process.env.SSL_CERT),

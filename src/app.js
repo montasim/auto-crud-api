@@ -6,6 +6,7 @@ import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+import configuration from './configuration/configuration.js';
 import logger from './lib/logger.js';
 import sharedResponseTypes from './utils/responseTypes.js';
 
@@ -28,6 +29,18 @@ import cspViolationReport from './service/cspViolationReport.js';
 import initializeRoutes from './modules/routeInitializer.js';
 
 const app = express();
+
+// If behind a proxy that terminates TLS (like Nginx), ensure the proper headers are set.
+// In production, redirect any non-HTTPS request to HTTPS.
+if (configuration.app.isProduction) {
+    app.use((req, res, next) => {
+        // Check both req.secure and the x-forwarded-proto header.
+        if (!req.secure && req.headers['x-forwarded-proto'] !== 'https') {
+            return res.redirect(`https://${req.headers.host}${req.url}`);
+        }
+        next();
+    });
+}
 
 // Security middleware (early in the stack)
 logger.debug('Initializing security middleware...');
@@ -88,9 +101,12 @@ app.use('/api/report/csp-violation', cspRoutes);
 app.use('/api/report/hpp-violation', hppRoutes);
 logger.debug('Violation reporting routes added.');
 
-app.get('/debug-sentry', (req, res, error) => {
-    throw new Error(error);
-});
+// Do not expose debug endpoints in production.
+if (!configuration.app.isProduction) {
+    app.get('/debug-sentry', (req, res, error) => {
+        throw new Error(error);
+    });
+}
 
 // Optional fallthrough error handler
 app.use((err, req, res, next) => {

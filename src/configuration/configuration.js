@@ -575,6 +575,7 @@ const configuration = {
     app: {
         // Grouping general application settings
         environment: envVars.NODE_ENV,
+        isProduction: envVars.NODE_ENV === envVars.PRODUCTION,
     },
     server: {
         // Grouping server related settings

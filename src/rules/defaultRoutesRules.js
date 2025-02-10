@@ -5,7 +5,7 @@ import httpMethods from '../constants/httpMethods.js';
 const defaultRequestContentType = contentTypes.JSON;
 const defaultResponseContentType = contentTypes.JSON;
 
-const defaultRules = {
+const defaultRoutesRules = {
     schemaRules: {},
     routes: [
         {
@@ -201,4 +201,4 @@ const defaultRules = {
     ],
 };
 
-export default defaultRules;
+export default defaultRoutesRules;

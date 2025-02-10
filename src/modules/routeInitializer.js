@@ -2,7 +2,7 @@ import createMongooseModel from '../models/SchemaFactory.js';
 import createZodSchema from '../validators/ZodFactory.js';
 import createCrudRoutes from '../routes/CrudFactory.js';
 
-import defaultRules from '../rules/defaultRules.js';
+import defaultRoutesRules from '../rules/defaultRoutesRules.js';
 import httpMethods from '../constants/httpMethods.js';
 import logger from '../lib/logger.js';
 import configuration from '../configuration/configuration.js';
@@ -16,7 +16,7 @@ const initializeRoutes = (app) => {
                 logger.warn(
                     `No routes defined for ${name}. Applying default rules.`
                 );
-                routes = defaultRules.routes; // Apply default rules if not defined
+                routes = defaultRoutesRules.routes; // Apply default rules if not defined
             }
 
             const model = createMongooseModel(name, schema);
@@ -29,7 +29,7 @@ const initializeRoutes = (app) => {
                 const method = route.method || httpMethods.ALL;
                 const rules =
                     route.rules ||
-                    defaultRules.routes.find(
+                    defaultRoutesRules.routes.find(
                         (defaultRoute) => defaultRoute.method === method
                     )?.rules ||
                     {};

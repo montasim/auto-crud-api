@@ -4,9 +4,10 @@ const swaggerConfiguration = {
         info: {
             title: 'Auto CRUD API',
             version: '1.0.0',
+            description: 'Your API Description',
         },
     },
-    apis: ['./routes/*.js'],
+    apis: [],
 };
 
 export default swaggerConfiguration;

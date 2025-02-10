@@ -27,6 +27,8 @@ import hppRoutes from './routes/HppRoutes.js';
 import cspViolationReport from './service/cspViolationReport.js';
 
 import initializeRoutes from './modules/routeInitializer.js';
+import asyncHandler from './utils/asyncHandler.js';
+import availableRoutes from './service/availableRoutes.js';
 
 const app = express();
 
@@ -100,6 +102,13 @@ logger.debug('Adding violation reporting routes...');
 app.use('/api/report/csp-violation', cspRoutes);
 app.use('/api/report/hpp-violation', hppRoutes);
 logger.debug('Violation reporting routes added.');
+
+// Add this endpoint after dynamic routes have been initialized
+
+app.get(
+    '/api/routes-info',
+    asyncHandler((req, res) => availableRoutes(req, res))
+);
 
 // Do not expose debug endpoints in production.
 if (!configuration.app.isProduction) {

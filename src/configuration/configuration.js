@@ -62,6 +62,7 @@ import logger from '../lib/logger.js';
 import isUrlReachable from '../utils/isUrlReachable.js';
 
 import { EnvironmentVariableError } from '../lib/customErrors.js';
+import getIntValue from "../utils/getIntValue.js";
 
 dotenv.config();
 
@@ -575,9 +576,9 @@ const configuration = {
     },
     server: {
         // Grouping server related settings
-        port: envVars.SERVER_PORT,
-        timeoutSeconds: envVars.SERVER_TIMEOUT_SECONDS,
-        jsonPayloadLimitKB: envVars.SERVER_JSON_PAYLOAD_LIMIT_KB,
+        port: getIntValue(envVars.SERVER_PORT),
+        timeoutSeconds: getIntValue(envVars.SERVER_TIMEOUT_SECONDS),
+        jsonPayloadLimitKB: getIntValue(envVars.SERVER_JSON_PAYLOAD_LIMIT_KB),
     },
     database: {
         // Grouping database settings
@@ -593,7 +594,7 @@ const configuration = {
     },
     cache: {
         // Grouping cache settings
-        defaultTtlSeconds: envVars.CACHE_DEFAULT_TTL_SECONDS, // More descriptive
+        defaultTtlSeconds: getIntValue(envVars.CACHE_DEFAULT_TTL_SECONDS), // More descriptive
     },
     auth: {
         // Grouping authentication settings
@@ -607,20 +608,20 @@ const configuration = {
         },
         session: {
             // Grouping session related settings
-            maxActiveSessions: envVars.AUTH_MAX_ACTIVE_SESSIONS,
+            maxActiveSessions: getIntValue(envVars.AUTH_MAX_ACTIVE_SESSIONS),
         },
         lockoutDurationSeconds: {
             // More descriptive, using seconds consistently
-            login: envVars.AUTH_LOCK_DURATION_LOGIN_SECONDS,
-            resetPassword: envVars.AUTH_LOCK_DURATION_RESET_PASSWORD_SECONDS,
-            verifyEmail: envVars.AUTH_LOCK_DURATION_VERIFY_EMAIL_SECONDS,
-            changeEmail: envVars.AUTH_LOCK_DURATION_CHANGE_EMAIL_SECONDS,
-            changePassword: envVars.AUTH_LOCK_DURATION_CHANGE_PASSWORD_SECONDS,
+            login: getIntValue(envVars.AUTH_LOCK_DURATION_LOGIN_SECONDS),
+            resetPassword: getIntValue(envVars.AUTH_LOCK_DURATION_RESET_PASSWORD_SECONDS),
+            verifyEmail: getIntValue(envVars.AUTH_LOCK_DURATION_VERIFY_EMAIL_SECONDS),
+            changeEmail: getIntValue(envVars.AUTH_LOCK_DURATION_CHANGE_EMAIL_SECONDS),
+            changePassword: getIntValue(envVars.AUTH_LOCK_DURATION_CHANGE_PASSWORD_SECONDS),
         },
         rateLimit: {
             // Grouping rate limiting settings
-            maxRequestsPerWindow: envVars.RATE_LIMIT_MAX_REQUESTS_PER_WINDOW, // More descriptive
-            windowMs: envVars.RATE_LIMIT_WINDOW_MS,
+            maxRequestsPerWindow: getIntValue(envVars.RATE_LIMIT_MAX_REQUESTS_PER_WINDOW), // More descriptive
+            windowMs: getIntValue(envVars.RATE_LIMIT_WINDOW_MS),
             exposeHeaders: envVars.RATE_LIMIT_EXPOSE_HEADERS, // More descriptive
         },
         cookie: {
@@ -628,7 +629,7 @@ const configuration = {
             user: {
                 // Grouping user cookie settings
                 name: envVars.COOKIE_USER_NAME, // Consistent cookie naming
-                maxAgeSeconds: envVars.COOKIE_USER_MAX_AGE_SECONDS, // Consistent units
+                maxAgeSeconds: getIntValue(envVars.COOKIE_USER_MAX_AGE_SECONDS), // Consistent units
                 secure: envVars.COOKIE_USER_SECURE,
                 httpOnly: envVars.COOKIE_USER_HTTP_ONLY,
                 sameSite: envVars.COOKIE_USER_SAME_SITE,
@@ -636,7 +637,7 @@ const configuration = {
             admin: {
                 // Grouping admin cookie settings
                 name: envVars.COOKIE_ADMIN_NAME, // Consistent cookie naming
-                maxAgeSeconds: envVars.COOKIE_ADMIN_MAX_AGE_SECONDS, // Consistent units
+                maxAgeSeconds: getIntValue(envVars.COOKIE_ADMIN_MAX_AGE_SECONDS), // Consistent units
                 secure: envVars.COOKIE_ADMIN_SECURE,
                 httpOnly: envVars.COOKIE_ADMIN_HTTP_ONLY,
                 sameSite: envVars.COOKIE_ADMIN_SAME_SITE,
@@ -647,22 +648,22 @@ const configuration = {
             accessToken: {
                 // Grouping access token settings
                 secret: envVars.JWT_ACCESS_TOKEN_SECRET,
-                expiryMinutes: envVars.JWT_ACCESS_TOKEN_EXPIRY_MINUTES, // Consistent naming
+                expiryMinutes: getIntValue(envVars.JWT_ACCESS_TOKEN_EXPIRY_MINUTES), // Consistent naming
             },
             refreshToken: {
                 // Grouping refresh token settings
                 secret: envVars.JWT_REFRESH_TOKEN_SECRET,
-                expiryMinutes: envVars.JWT_REFRESH_TOKEN_EXPIRY_MINUTES, // Consistent naming
+                expiryMinutes: getIntValue(envVars.JWT_REFRESH_TOKEN_EXPIRY_MINUTES), // Consistent naming
             },
             resetPasswordToken: {
                 // Grouping reset password token settings
                 secret: envVars.JWT_RESET_PASSWORD_TOKEN_SECRET,
-                expiryMinutes: envVars.JWT_RESET_PASSWORD_TOKEN_EXPIRY_MINUTES, // Consistent naming
+                expiryMinutes: getIntValue(envVars.JWT_RESET_PASSWORD_TOKEN_EXPIRY_MINUTES), // Consistent naming
             },
             verifyEmailToken: {
                 // Grouping verify email token settings
                 secret: envVars.JWT_VERIFY_EMAIL_TOKEN_SECRET,
-                expiryMinutes: envVars.JWT_VERIFY_EMAIL_TOKEN_EXPIRY_MINUTES, // Consistent naming
+                expiryMinutes: getIntValue(envVars.JWT_VERIFY_EMAIL_TOKEN_EXPIRY_MINUTES), // Consistent naming
             },
         },
     },
@@ -720,10 +721,10 @@ const configuration = {
         smtp: {
             // Grouping SMTP settings
             host: envVars.EMAIL_SMTP_HOST,
-            port: envVars.EMAIL_SMTP_PORT,
+            port: getIntValue(envVars.EMAIL_SMTP_PORT),
             username: envVars.EMAIL_SMTP_USERNAME,
             password: envVars.EMAIL_SMTP_PASSWORD,
-            maxConnectionAttempts: envVars.EMAIL_SMTP_MAX_CONNECTION_ATTEMPTS,
+            maxConnectionAttempts: getIntValue(envVars.EMAIL_SMTP_MAX_CONNECTION_ATTEMPTS),
         },
     },
     googleDriveService: {

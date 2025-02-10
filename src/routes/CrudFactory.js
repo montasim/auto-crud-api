@@ -65,7 +65,8 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
                             uniqueFields,
                             modelNameInSentenceCase,
                             getPopulatedDocument,
-                            referenceFields
+                            referenceFields,
+                            rules
                         );
                     })
                 );

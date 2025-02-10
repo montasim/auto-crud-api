@@ -96,7 +96,10 @@ const getDocumentsList = async (
             .skip((parsedPage - 1) * parsedLimit)
             .limit(parsedLimit);
 
-        totalCount = await model.countDocuments(filterQuery);
+        totalCount = await model
+            .countDocuments(filterQuery)
+            .skip((parsedPage - 1) * parsedLimit)
+            .limit(parsedLimit);
     }
 
     const searchFilters = Object.keys(filterQuery).length

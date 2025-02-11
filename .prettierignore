@@ -136,6 +136,9 @@ next-env.d.ts
 # Private keys and sensitive files.
 *.pem
 
+# Postman collection file.
+Postman_Collection.json
+
 
 ####################################################
 # LOCAL FILE UPLOADS

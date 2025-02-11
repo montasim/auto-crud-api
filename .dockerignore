@@ -52,3 +52,4 @@ docker.log
 # Use: Prevent cluttering the repository with documentation which might be generated or too voluminous.
 ####################################################
 src/modules/api/documentation/
+Postman_Collection.json

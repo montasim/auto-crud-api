@@ -112,6 +112,7 @@ export default [
 
             'yarn.lock', // Ignore the Yarn lock file (used for dependency resolution)
             'terser.js', // Ignore the Terser script used for minification
+            'Postman_Collection.json', // Ignore the Postman collection file
         ],
     },
 ];

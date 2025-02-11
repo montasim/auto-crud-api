@@ -88,6 +88,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 *.pem
+Postman_Collection.json
 
 ####################################################
 # Local File Upload

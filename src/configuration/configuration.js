@@ -60,9 +60,10 @@ import routesConfig from '../../routes.config.mjs';
 import logger from '../lib/logger.js';
 
 import isUrlReachable from '../utils/isUrlReachable.js';
+import getIntValue from '../utils/getIntValue.js';
+import getBooleanValue from '../utils/getBooleanValue.js';
 
 import { EnvironmentVariableError } from '../lib/customErrors.js';
-import getIntValue from '../utils/getIntValue.js';
 
 dotenv.config();
 
@@ -567,6 +568,30 @@ const envSchema = z.object({
     SENTRY_AUTH_TOKEN: z.string({
         required_error: 'SENTRY_AUTH_TOKEN is required.',
     }),
+
+    APP_FEATURES_USE_HELMET: z.string().transform(getBooleanValue).optional(),
+    APP_FEATURES_USE_CORS: z.string().transform(getBooleanValue).optional(),
+    APP_FEATURES_USE_CORS_AUTHORIZATION_IDENTIFIER_HEADER: z
+        .string()
+        .transform(getBooleanValue)
+        .optional(),
+    APP_FEATURES_USE_HPP: z.string().transform(getBooleanValue).optional(),
+    APP_FEATURES_MEASURE_COMPRESSION_SIZE: z
+        .string()
+        .transform(getBooleanValue)
+        .optional(),
+    APP_FEATURES_USE_COMPRESSION: z
+        .string()
+        .transform(getBooleanValue)
+        .optional(),
+    APP_FEATURES_USE_RATE_LIMIT: z
+        .string()
+        .transform(getBooleanValue)
+        .optional(),
+    APP_FEATURES_SANITIZE_REQUEST: z
+        .string()
+        .transform(getBooleanValue)
+        .optional(),
 });
 
 let envVars;
@@ -793,14 +818,15 @@ const configuration = {
     },
 
     features: {
-        helmet: true,
-        cors: true,
-        checkCorsAuthorizationIdentifierHeader: false,
-        hpp: true,
-        measureCompressionSize: true,
-        compression: true,
-        rateLimit: true,
-        sanitizeRequest: true,
+        helmet: envVars.APP_FEATURES_USE_HELMET,
+        cors: envVars.APP_FEATURES_USE_CORS,
+        checkCorsAuthorizationIdentifierHeader:
+            envVars.APP_FEATURES_USE_CORS_AUTHORIZATION_IDENTIFIER_HEADER,
+        hpp: envVars.APP_FEATURES_USE_HPP,
+        measureCompressionSize: envVars.APP_FEATURES_MEASURE_COMPRESSION_SIZE,
+        compression: envVars.APP_FEATURES_USE_COMPRESSION,
+        rateLimit: envVars.APP_FEATURES_USE_RATE_LIMIT,
+        sanitizeRequest: envVars.APP_FEATURES_SANITIZE_REQUEST,
     },
 
     routes: routesConfig, // Kept as is, assuming it's route configurations

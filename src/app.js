@@ -45,21 +45,45 @@ if (configuration.app.isProduction) {
 }
 
 // Security middleware (early in the stack)
-logger.debug('Initializing security middleware...');
-app.use(helmet(helmetConfiguration));
-app.use(cors(corsConfiguration));
-// ✅ Apply the Site Identifier check globally
-// app.use(corsConfiguration.checkAuthorizationIdentifierHeader);
-app.use(hppConfiguration());
-app.use(measureCompressionSize);
-app.use(compressionConfiguration);
-logger.debug('Security middleware initialized.');
+logger.debug('Initializing middleware...');
+
+// Conditional Middleware Initialization
+if (configuration.features.helmet) {
+    app.use(helmet(helmetConfiguration));
+    logger.debug('Helmet middleware enabled.');
+}
+
+if (configuration.features.cors) {
+    app.use(cors(corsConfiguration));
+    logger.debug('CORS middleware enabled.');
+}
+
+if (configuration.features.checkCorsAuthorizationIdentifierHeader) {
+    app.use(corsConfiguration.checkAuthorizationIdentifierHeader);
+    logger.debug('CORS Authorization Identifier Header check enabled.');
+}
+
+if (configuration.features.hpp) {
+    app.use(hppConfiguration());
+    logger.debug('HPP middleware enabled.');
+}
+
+if (configuration.features.measureCompressionSize) {
+    app.use(measureCompressionSize);
+    logger.debug('Compression size measurement enabled.');
+}
+
+if (configuration.features.compression) {
+    app.use(compressionConfiguration);
+    logger.debug('Compression middleware enabled.');
+}
 
 // ✅ Rate Limiter to protect against brute-force attacks and abuse
-logger.debug('Applying rate limiting...');
-app.use(rateLimiter);
-logger.debug('Rate limiting enabled.');
-logger.debug('Security middleware initialized.');
+if (configuration.features.rateLimit) {
+    logger.debug('Applying rate limiting...');
+    app.use(rateLimiter);
+    logger.debug('Rate limiter enabled.');
+}
 
 // Morgan HTTP request logger setup
 logger.debug('Setting up request logging...');
@@ -73,9 +97,11 @@ app.use(express.urlencoded({ limit: '20mb', extended: true }));
 logger.debug('Body parsing configured.');
 
 // Sanitize request data
-logger.debug('Enabling request sanitization...');
-app.use(sanitizeRequestConfiguration);
-logger.debug('Request sanitization enabled.');
+if (configuration.features.sanitizeRequest) {
+    logger.debug('Enabling request sanitization...');
+    app.use(sanitizeRequestConfiguration);
+    logger.debug('Request sanitization enabled.');
+}
 
 // CSP Violation Logging Endpoint
 logger.debug('Adding CSP Violation logging endpoint...');

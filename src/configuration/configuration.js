@@ -792,6 +792,17 @@ const configuration = {
         authToken: envVars.SENTRY_AUTH_TOKEN,
     },
 
+    features: {
+        helmet: true,
+        cors: true,
+        checkCorsAuthorizationIdentifierHeader: false,
+        hpp: true,
+        measureCompressionSize: true,
+        compression: true,
+        rateLimit: true,
+        sanitizeRequest: true,
+    },
+
     routes: routesConfig, // Kept as is, assuming it's route configurations
 };
 

@@ -51,14 +51,36 @@ const asyncHandler = (fn) => {
             }
             // Handling MongoDB Duplicate Key Errors
             else if (error.code === 11000) {
-                const field = Object.keys(error.keyPattern)[0];
-                status = httpStatus.CONFLICT;
-                message = `Duplicate value error: ${field} already exists`;
-                errorDetails = new DuplicateKeyError(
-                    field,
-                    error.keyValue[field]
-                ).details;
-                logger.warn(`Duplicate Key Error: ${message}`, errorDetails);
+                // **FIX:** Check if keyPattern exists before using it
+                if (
+                    error.keyPattern &&
+                    Object.keys(error.keyPattern).length > 0
+                ) {
+                    const field = Object.keys(error.keyPattern)[0];
+                    status = httpStatus.CONFLICT;
+                    message = `Duplicate value error: ${field} already exists`;
+                    errorDetails = new DuplicateKeyError(
+                        field,
+                        error.keyValue[field]
+                    ).details;
+                    logger.warn(
+                        `Duplicate Key Error: ${message}`,
+                        errorDetails
+                    );
+                } else {
+                    // Handle the case where keyPattern is missing
+                    status = httpStatus.CONFLICT;
+                    message =
+                        'Duplicate key error occurred, but the field is unknown.'; // Or a more generic message
+                    errorDetails = {
+                        message: 'Missing keyPattern in error object',
+                    };
+                    logger.warn(
+                        `Duplicate Key Error: ${message}`,
+                        errorDetails,
+                        error
+                    ); // Log the full error for debugging
+                }
             }
             // Handling Mongoose Cast Errors (Invalid ObjectId)
             else if (error instanceof mongoose.Error.CastError) {

@@ -1,5 +1,6 @@
 import { Schema, Types } from 'mongoose';
 import contentTypes from 'content-types-lite';
+import mimeTypes from 'mime-types-lite';
 
 import constants from './src/constants/constants.js';
 import httpMethods from './src/constants/httpMethods.js';
@@ -24,6 +25,9 @@ const routesConfig = {
                 ],
                 minlength: [3, 'Name must be at least 3 characters'],
                 maxlength: [50, 'Name cannot exceed 50 characters'],
+            },
+            avatarUrl: {
+                type: String,
             },
             email: {
                 type: String,
@@ -97,6 +101,20 @@ const routesConfig = {
                 method: httpMethods.POST,
                 handler: createDummyDocuments,
                 dataValidation: false,
+                rules: {
+                    request: {
+                        contentType: contentTypes.MULTIPART_FORM_DATA,
+                        upload: {
+                            avatar: {
+                                multiple: true,
+                                maxFiles: 10,
+                                minSize: 100, // in KB
+                                maxSize: 500, // in KB
+                                allowedTypes: [mimeTypes.JPG, mimeTypes.PNG],
+                            },
+                        },
+                    },
+                },
             },
             {
                 paths: ['/', '/all', '/list', '/read', '/show', '/view'],

@@ -73,6 +73,7 @@
     "jsdom": "^26.0.0",
     "jsonwebtoken": "^9.0.2",
     "log-symbols": "^7.0.0",
+    "mime-types-lite": "^1.5.1",
     "mongoose": "^8.9.6",
     "morgan": "^1.10.0",
     "pm2": "^5.4.3",

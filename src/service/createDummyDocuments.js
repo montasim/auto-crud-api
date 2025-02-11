@@ -159,7 +159,11 @@ const createDummyDocuments = async (
 ) => {
     const responsePipeline = rules?.response?.pipeline || [];
     const contentType = rules?.response?.contentType || contentTypes.JSON;
-    const { count = 1 } = req.query;
+    const { count } = req.query;
+    if (!count) {
+        const msg = `Bad Request: The "count" parameter is required to create dummy data.`;
+        return sharedResponseTypes.BAD_REQUEST(req, res, contentType, msg);
+    }
     const parsedCount = getIntValue(count);
 
     // 🔹 Validate 'count' parameter

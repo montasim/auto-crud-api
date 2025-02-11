@@ -1,4 +1,3 @@
-import { Schema, Types } from 'mongoose';
 import contentTypes from 'content-types-lite';
 import mimeTypes from 'mime-types-lite';
 
@@ -103,7 +102,7 @@ const routesConfig = {
                 dataValidation: false,
                 rules: {
                     request: {
-                        contentType: contentTypes.MULTIPART_FORM_DATA,
+                        contentType: contentTypes.JSON,
                         upload: {
                             avatar: {
                                 multiple: true,
@@ -130,6 +129,32 @@ const routesConfig = {
                 paths: ['/:id', '/edit/:id', '/update/:id'],
                 method: httpMethods.PATCH,
                 handler: updateADocument,
+                rules: {
+                    request: {
+                        contentType: contentTypes.JSON,
+                        upload: {
+                            avatar: {
+                                multiple: false,
+                                maxFiles: 1,
+                                minSize: 100, // in KB
+                                maxSize: 500, // in KB
+                                allowedTypes: [mimeTypes.JPG, mimeTypes.PNG],
+                            },
+                        },
+                    },
+                    response: {
+                        contentType: contentTypes.JSON,
+                        pipeline: [
+                            { $match: {} },
+                            {
+                                $project: {
+                                    __v: 0,
+                                    createdAt: 0,
+                                },
+                            },
+                        ],
+                    },
+                },
             },
             {
                 paths: ['/:id', '/delete/:id', '/destroy/:id'],

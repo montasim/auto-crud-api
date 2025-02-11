@@ -2,6 +2,8 @@ import contentTypes from 'content-types-lite';
 
 import sharedResponseTypes from '../utils/responseTypes.js';
 
+import convertToMongooseObjectId from '../utils/convertToMongooseObjectId.js';
+
 const updateADocument = async (
     req,
     res,
@@ -42,20 +44,20 @@ const updateADocument = async (
 
     let updatedDoc;
     if (responsePipeline) {
-        // Ensure `$match` stage filters by updated document ID
         const pipeline = [...responsePipeline];
 
         const matchIndex = pipeline.findIndex((stage) => stage.$match);
         if (matchIndex !== -1) {
             pipeline[matchIndex].$match = {
                 ...pipeline[matchIndex].$match,
-                _id: docId,
+                _id: convertToMongooseObjectId(docId),
             };
         } else {
-            pipeline.unshift({ $match: { _id: docId } });
+            pipeline.unshift({
+                $match: { _id: convertToMongooseObjectId(docId) },
+            });
         }
 
-        // Fetch the updated document using aggregation
         const result = await model.aggregate(pipeline);
         updatedDoc = result.length > 0 ? result[0] : null;
     } else {

@@ -108,6 +108,29 @@ const envSchema = z.object({
     }),
 
     // Server
+    SERVER_URL: z
+        .string({
+            required_error: 'SERVER_URL is required.',
+        })
+        .refine(
+            async (val) => {
+                val = val.trim();
+
+                if (val.includes('localhost') || val.includes('127.0.0.1')) {
+                    return true;
+                } else {
+                    try {
+                        new URL(val); // Validate URL structure
+                        return await isUrlReachable(val); // Check if the URL exists
+                    } catch {
+                        return false; // Invalid URL format
+                    }
+                }
+            },
+            {
+                message: 'SERVER_URL must be a valid URL and reachable.',
+            }
+        ),
     SERVER_PORT: toNumber(
         z
             .number({
@@ -579,6 +602,7 @@ const configuration = {
     },
     server: {
         // Grouping server related settings
+        url: envVars.SERVER_URL,
         port: getIntValue(envVars.SERVER_PORT),
         timeoutSeconds: getIntValue(envVars.SERVER_TIMEOUT_SECONDS),
         jsonPayloadLimitKB: getIntValue(envVars.SERVER_JSON_PAYLOAD_LIMIT_KB),

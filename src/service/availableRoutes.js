@@ -39,7 +39,13 @@ const availableRoutes = (req, res) => {
     });
 
     // Return the compiled, grouped list of routes as JSON.
-    return sharedResponseTypes.OK(req, res, contentTypes.JSON, groupedRoutes);
+    return sharedResponseTypes.OK(
+        req,
+        res,
+        contentTypes.JSON,
+        'Successfully retrieved available routes.',
+        groupedRoutes
+    );
 };
 
 export default availableRoutes;

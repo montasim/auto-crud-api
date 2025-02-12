@@ -1,7 +1,8 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
 import logSymbols from 'log-symbols';
-import path from 'path';
+
+import environments from "../constants/environments.js";
 
 // Define log directory
 const LOG_DIR = 'logs';
@@ -10,8 +11,8 @@ const LOG_DIR = 'logs';
 const logLevelToSymbol = {
     info: logSymbols.success, // ✅
     warn: logSymbols.warning, // ⚠️
-    error: logSymbols.error, // ❌
-    debug: logSymbols.info, // ℹ️
+    error: logSymbols.error,  // ❌
+    debug: logSymbols.info,   // ℹ️
 };
 
 // Create a custom log format with log symbols
@@ -27,7 +28,7 @@ const customFormat = winston.format.combine(
 const createDailyRotateTransport = (filename, level) =>
     new winston.transports.DailyRotateFile({
         dirname: LOG_DIR, // Directory where log files will be saved
-        filename: path.join(LOG_DIR, `${filename}-%DATE%.log`), // Include filename pattern with date
+        filename: `${filename}-%DATE%.log`, // Include filename pattern with date
         datePattern: 'YYYY-MM-DD', // Rotate daily
         maxFiles: '30d', // Retain logs for 30 days
         level, // Minimum log level for this file
@@ -44,5 +45,10 @@ const logger = winston.createLogger({
         createDailyRotateTransport('errors', 'error'), // Error logs with daily rotation
     ],
 });
+
+// Disable all logging in production
+if (process.env.NODE_ENV === environments.PRODUCTION) {
+    logger.silent = true;
+}
 
 export default logger;

@@ -9,6 +9,7 @@ id = 42e3c1de-4bfe-4e20-8285-e8719c4982c6
 
 [config.relations.collections]
 rootDirectory = postman/collections
+files[] = {"id":"12432462-ed800fdc-0634-48f9-9d91-a605f8b12fec","path":"auto-crud-api.json","metaData":{}}
 
 [config.relations.collections.metaData]
 

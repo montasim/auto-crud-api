@@ -7,7 +7,7 @@ import environments from "../constants/environments.js";
 // Define log directory
 const LOG_DIR = 'logs';
 
-// Function to map log levels to log symbols
+// Map log levels to log symbols
 const logLevelToSymbol = {
     info: logSymbols.success, // ✅
     warn: logSymbols.warning, // ⚠️
@@ -17,9 +17,9 @@ const logLevelToSymbol = {
 
 // Create a custom log format with log symbols
 const customFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // Improved timestamp format
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message }) => {
-        const symbol = logLevelToSymbol[level] || logSymbols.info; // Default to ℹ️
+        const symbol = logLevelToSymbol[level] || logSymbols.info;
         return `${timestamp} [${level.toUpperCase()}] ${symbol} ${message}`;
     })
 );
@@ -27,28 +27,31 @@ const customFormat = winston.format.combine(
 // Create a function to configure daily rotated file transport
 const createDailyRotateTransport = (filename, level) =>
     new winston.transports.DailyRotateFile({
-        dirname: LOG_DIR, // Directory where log files will be saved
-        filename: `${filename}-%DATE%.log`, // Include filename pattern with date
-        datePattern: 'YYYY-MM-DD', // Rotate daily
-        maxFiles: '30d', // Retain logs for 30 days
-        level, // Minimum log level for this file
+        dirname: LOG_DIR,
+        filename: `${filename}-%DATE%.log`,
+        datePattern: 'YYYY-MM-DD',
+        maxFiles: '30d',
+        level,
         format: customFormat,
     });
 
-// Create logger instance
+// Prepare the transports array conditionally based on environment
+const transports = [];
+
+// In development, add both console and file transports
+if (process.env.NODE_ENV !== environments.PRODUCTION) {
+    transports.push(
+        new winston.transports.Console({ format: customFormat }),
+        createDailyRotateTransport('combined', 'info'),
+        createDailyRotateTransport('errors', 'error')
+    );
+}
+
+// Create logger instance with the conditional transports
 const logger = winston.createLogger({
     level: 'info',
-    format: customFormat, // Apply the custom format globally
-    transports: [
-        new winston.transports.Console({ format: customFormat }), // Console logging with symbols
-        createDailyRotateTransport('combined', 'info'), // All logs with daily rotation
-        createDailyRotateTransport('errors', 'error'), // Error logs with daily rotation
-    ],
+    format: customFormat,
+    transports,
 });
-
-// Disable all logging in production
-if (process.env.NODE_ENV === environments.PRODUCTION) {
-    logger.silent = true;
-}
 
 export default logger;

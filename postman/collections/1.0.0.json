@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "365e6e25-b393-418e-ad7d-98d3f2045ee8",
-		"name": "auto-crud-api",
+		"name": "1.0.0",
 		"description": "A collection generated from dynamic API routes grouped by HTTP method.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_uid": "12432462-365e6e25-b393-418e-ad7d-98d3f2045ee8"
@@ -98,6 +98,9 @@
 										}
 									],
 									"id": "c7fa6500-284f-4fc2-803d-ff1de4a8a8ad",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -140,7 +143,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"name\": \"{{name}}\",\n    \"avatarUrl\": \"{{avatarUrl}}\",\n    \"email\": \"{{email}}\",\n    \"nid\": \"{{nid}}\",\n    \"phone\": \"{{phone}}\",\n    \"bio\": \"{{bio}}\",\n    \"portfolio\": \"{{portfolio}}\",\n    \"age\": {{age}},\n    \"isActive\": {{isActive}}\n}\n",
+													"raw": "{\n    \"name\": \"\",\n    \"avatarUrl\": \"\",\n    \"email\": \"\",\n    \"nid\": \"\",\n    \"phone\": \"\",\n    \"bio\": \"\",\n    \"portfolio\": \"\",\n    \"age\": ,\n    \"isActive\": \n}\n",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -148,9 +151,12 @@
 													}
 												},
 												"url": {
-													"raw": "{{SERVER_URL}}/api/users",
+													"raw": "https://auto-crud-api.vercel.app/api/users",
+													"protocol": "https",
 													"host": [
-														"{{SERVER_URL}}"
+														"auto-crud-api",
+														"vercel",
+														"app"
 													],
 													"path": [
 														"api",
@@ -161,7 +167,6 @@
 											"status": "Created",
 											"code": 201,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -297,7 +302,6 @@
 											"status": "Bad Request",
 											"code": 400,
 											"_postman_previewlanguage": "raw",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -433,7 +437,6 @@
 											"status": "Forbidden",
 											"code": 403,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -614,6 +617,9 @@
 										}
 									],
 									"id": "16f2b967-b7ce-4fc8-bdbd-dcc92103efe5",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -738,6 +744,9 @@
 										}
 									],
 									"id": "9b4ce0b1-d168-4f6b-95ce-8a0093011adf",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -846,6 +855,9 @@
 										}
 									],
 									"id": "6ac0fe3b-eb60-4c81-b0fe-6051728cb868",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -886,9 +898,12 @@
 													}
 												],
 												"url": {
-													"raw": "{{SERVER_URL}}/api/users/create/dummy?count={{count}}",
+													"raw": "https://auto-crud-api.vercel.app/api/users/create/dummy?count=",
+													"protocol": "https",
 													"host": [
-														"{{SERVER_URL}}"
+														"auto-crud-api",
+														"vercel",
+														"app"
 													],
 													"path": [
 														"api",
@@ -899,7 +914,7 @@
 													"query": [
 														{
 															"key": "count",
-															"value": "{{count}}"
+															"value": ""
 														}
 													]
 												}
@@ -907,7 +922,6 @@
 											"status": "Created",
 											"code": 201,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -1026,7 +1040,6 @@
 											"status": "Bad Request",
 											"code": 400,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -1191,6 +1204,9 @@
 										}
 									],
 									"id": "f03e714e-a34a-4172-b1c0-0a199dc51059",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1296,6 +1312,9 @@
 										}
 									],
 									"id": "55ee18f3-e10d-403b-9696-ba753cbbff3c",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1401,6 +1420,9 @@
 										}
 									],
 									"id": "faf2f1d0-be2d-4ae7-bd96-9426bae1ff99",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1506,6 +1528,9 @@
 										}
 									],
 									"id": "0635bdbd-81d9-4c13-a8da-97d77487c5c5",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1611,6 +1636,9 @@
 										}
 									],
 									"id": "6fb20d84-642e-42eb-b9fd-8a9d78cf163e",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1716,6 +1744,9 @@
 										}
 									],
 									"id": "73bf57da-b95f-434c-89a0-d94896a0c6f9",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1821,6 +1852,9 @@
 										}
 									],
 									"id": "1e14571a-07b4-42bc-bf4f-7957af33a597",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -1926,6 +1960,9 @@
 										}
 									],
 									"id": "4fd6fcce-1067-45ca-9781-cea8198034d5",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -2172,6 +2209,9 @@
 										}
 									],
 									"id": "e095af2b-6082-4af9-a265-8c1d9e7528d8",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -2217,7 +2257,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -2513,6 +2552,9 @@
 										}
 									],
 									"id": "98fdf8a5-0463-4999-8b7e-216e2fb08a91",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -2743,6 +2785,9 @@
 										}
 									],
 									"id": "4338bf0b-7b57-44cd-afe3-0f4b7ced3bdd",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -2973,6 +3018,9 @@
 										}
 									],
 									"id": "58634d9b-5c8d-4716-a5f1-eb7f5627175c",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3203,6 +3251,9 @@
 										}
 									],
 									"id": "041d0749-73c9-494d-90d2-1348bb5402f9",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3433,6 +3484,9 @@
 										}
 									],
 									"id": "2f5bf5cb-e6f4-4d2e-89d0-b580894774fd",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3556,6 +3610,9 @@
 										}
 									],
 									"id": "b1a9ae14-0620-4c5c-acd4-14840f7b258b",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3681,6 +3738,9 @@
 										}
 									],
 									"id": "4c6bbe79-22a3-4346-9a0b-708d806037aa",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3807,6 +3867,9 @@
 										}
 									],
 									"id": "a3af3db8-3194-40ee-bcac-550dad64b08f",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -3933,6 +3996,9 @@
 										}
 									],
 									"id": "0d3aaa80-44df-47c1-80d4-619d7c38519c",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -4079,6 +4145,9 @@
 										}
 									],
 									"id": "fdb36bd8-3d29-42aa-a37d-13bd657170da",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "PATCH",
 										"header": [
@@ -4144,7 +4213,6 @@
 											"status": "Internal Server Error",
 											"code": 500,
 											"_postman_previewlanguage": "raw",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -4374,6 +4442,9 @@
 										}
 									],
 									"id": "ed00c3c3-7030-4e0c-9ce4-46e3416a0862",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "PATCH",
 										"header": [
@@ -4532,6 +4603,9 @@
 										}
 									],
 									"id": "33693deb-fe97-4d95-a18a-6b0151b1f996",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "PATCH",
 										"header": [
@@ -4673,6 +4747,9 @@
 										}
 									],
 									"id": "634108b0-48a0-4929-89ad-ea04b2dee0e1",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -4720,7 +4797,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Access-Control-Allow-Credentials",
@@ -4894,6 +4970,9 @@
 										}
 									],
 									"id": "f39e9b62-8586-4ac5-bd17-62c68f53b64a",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -4995,6 +5074,9 @@
 										}
 									],
 									"id": "921555ce-62c3-4b05-98bd-83889806c47a",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5098,6 +5180,9 @@
 										}
 									],
 									"id": "79ed270b-be29-4855-b960-b0a4195de9b0",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5155,7 +5240,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Access-Control-Allow-Credentials",
@@ -5280,7 +5364,6 @@
 											"status": "Bad Request",
 											"code": 400,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -5448,6 +5531,9 @@
 										}
 									],
 									"id": "32d92b4f-c0ad-4e89-a48e-0fb2f11d6354",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5507,7 +5593,6 @@
 											"status": "Bad Request",
 											"code": 400,
 											"_postman_previewlanguage": "raw",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Access-Control-Allow-Credentials",
@@ -5683,6 +5768,9 @@
 										}
 									],
 									"id": "3c276a76-1207-4953-b70b-e860947511f2",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5791,6 +5879,9 @@
 										}
 									],
 									"id": "45fc2788-1348-4168-9514-cf5f75db0100",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5899,6 +5990,9 @@
 										}
 									],
 									"id": "0a851c98-1567-4d89-bcd4-f620191e36e3",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -5976,6 +6070,9 @@
 										}
 									],
 									"id": "84ac9fe1-f09c-47d9-b7a0-adf9004fa906",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -6086,6 +6183,9 @@
 										}
 									],
 									"id": "216fd2fd-4816-4900-9ba3-a279c570aa67",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "POST",
 										"header": [
@@ -6149,7 +6249,6 @@
 											"status": "Created",
 											"code": 201,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Access-Control-Allow-Credentials",
@@ -6329,6 +6428,9 @@
 										}
 									],
 									"id": "845e483d-427f-4142-859b-a1bbd9dc91df",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -6374,7 +6476,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -6514,6 +6615,9 @@
 										}
 									],
 									"id": "5dd93be1-8a1e-4888-a262-1aa8a181cff7",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -6561,7 +6665,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -6700,6 +6803,9 @@
 										}
 									],
 									"id": "5571641e-363b-4434-9e24-59b6babf89d9",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -6747,7 +6853,6 @@
 											"status": "OK",
 											"code": 200,
 											"_postman_previewlanguage": "json",
-											"_postman_previewtype": "html",
 											"header": [
 												{
 													"key": "Content-Security-Policy-Report-Only",
@@ -6934,6 +7039,9 @@
 										}
 									],
 									"id": "ff209c10-1c07-4c74-b77d-420723a1843a",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "GET",
 										"header": [
@@ -7065,6 +7173,9 @@
 										}
 									],
 									"id": "7245e6fe-4ba3-4a5f-ae1d-167a4e588d05",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "PATCH",
 										"header": [
@@ -7188,6 +7299,9 @@
 										}
 									],
 									"id": "a58b12cc-60ec-4bb4-a173-f9a5785ac238",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7305,6 +7419,9 @@
 										}
 									],
 									"id": "2d145fb6-d873-44cb-a9fd-88da9218c8fb",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7389,6 +7506,9 @@
 										}
 									],
 									"id": "cf4b8b4e-93fd-4ab7-8c3e-bef36831f727",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7468,6 +7588,9 @@
 										}
 									],
 									"id": "e687caed-bcc1-4885-a7ba-3b7d9b503aa9",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7547,6 +7670,9 @@
 										}
 									],
 									"id": "eda4471e-e8d4-4279-8ff9-b25d9a8d2d86",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7626,6 +7752,9 @@
 										}
 									],
 									"id": "844a5cd2-054e-40d4-988d-21c38285d2a5",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7697,6 +7826,9 @@
 										}
 									],
 									"id": "4c18cad1-aa23-4291-a3c4-9e95a9ac98dd",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -7785,6 +7917,9 @@
 						}
 					],
 					"id": "d1157b75-2822-45c6-99cb-fec936f10b8a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -7820,7 +7955,6 @@
 							"status": "OK",
 							"code": 200,
 							"_postman_previewlanguage": "json",
-							"_postman_previewtype": "html",
 							"header": [
 								{
 									"key": "Content-Security-Policy-Report-Only",
@@ -7926,7 +8060,6 @@
 							"status": "Not Found",
 							"code": 404,
 							"_postman_previewlanguage": "raw",
-							"_postman_previewtype": "html",
 							"header": [
 								{
 									"key": "Content-Security-Policy-Report-Only",

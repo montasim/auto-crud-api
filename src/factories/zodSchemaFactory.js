@@ -5,7 +5,7 @@ import schema from '../lib/schema.js';
 
 const { isValidObjectId, idSchema } = schema;
 
-const buildZodSchemas = (name, schemaDefinition, routes) => {
+const zodSchemaFactory = (name, schemaDefinition, routes) => {
     const createSchema = {};
     const updateSchema = {};
 
@@ -67,4 +67,4 @@ const buildZodSchemas = (name, schemaDefinition, routes) => {
     };
 };
 
-export default buildZodSchemas;
+export default zodSchemaFactory;

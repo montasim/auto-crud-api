@@ -1,17 +1,35 @@
 name: Automated API tests using Postman CLI
 
-on: push
+on:
+  push:
+    branches:
+      - main
+
 
 jobs:
-    automated-api-tests:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Install Postman CLI
-              run: |
-                  curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-            - name: Login to Postman CLI
-              run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
-            - name: Run API tests
-              run: |
-                  postman collection run "${{ github.workspace }}/postman/collections/1.0.0.json" -e "12432462-515329b0-b510-4036-8744-44a2ba423e62"
+  automated-api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run API Collection
+        run: newman run "${{secrets.collection_url}}" --env-var="baseUrl=${{secrets.baseUrl}}"
+
+      - name: Generate HTML Report
+        run: newman run "${{secrets.collection_url}}" --env-var="baseUrl=${{secrets.baseUrl}}" -r htmlextra --reporter-htmlextra-export "newman/report.html"
+      - name: see
+        run: ls
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: newman-report
+          path: newman/report.html

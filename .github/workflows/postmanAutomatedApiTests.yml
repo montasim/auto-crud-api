@@ -20,16 +20,18 @@ jobs:
               run: npm install -g newman newman-reporter-htmlextra
 
             - name: Run API Collection
-              run: newman run "${{ secrets.collection_url }}" --env-var="SERVER_URL=${{ secrets.baseUrl }}"
+              run: newman run "${{ secrets.collection_url }}" --env-var="baseUrl=${{ secrets.baseUrl }}"
 
             - name: Generate HTML Report
-              run: newman run "${{ secrets.collection_url }}" --env-var="SERVER_URL=${{ secrets.baseUrl }}" -r htmlextra --reporter-htmlextra-export "newman/report.html"
+              run: newman run "${{ secrets.collection_url }}" --env-var="baseUrl=${{ secrets.baseUrl }}" -r htmlextra --reporter-htmlextra-export "newman/report.html"
 
-            - name: see
-              run: ls
+            # Rename or copy report.html to index.html so GitHub Pages will load it by default
+            - name: Prepare report for GitHub Pages
+              run: cp newman/report.html newman/index.html
 
-            - name: Upload Report
-              uses: actions/upload-artifact@v4
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
               with:
-                  name: newman-report
-                  path: newman/report.html
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: newman
+                  publish_branch: gh-pages

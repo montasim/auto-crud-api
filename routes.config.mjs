@@ -11,6 +11,7 @@ import getADocument from './src/service/getADocument.js';
 import updateADocument from './src/service/updateADocument.js';
 import deleteADocument from './src/service/deleteADocument.js';
 import deleteDocumentList from './src/service/deleteDocumentList.js';
+import deleteAllDocuments from './src/service/deleteAllDocuments.js';
 
 const routesConfig = {
     users: {
@@ -157,9 +158,14 @@ const routesConfig = {
                 },
             },
             {
-                paths: ['/:id', '/delete/:id', '/destroy/:id'],
+                paths: [
+                    '/delete/all',
+                    '/delete-all',
+                    '/destroy/all',
+                    '/destroy-all',
+                ],
                 method: HTTP_METHODS.DELETE,
-                handler: deleteADocument,
+                handler: deleteAllDocuments,
             },
             {
                 paths: [
@@ -171,6 +177,11 @@ const routesConfig = {
                 ],
                 method: HTTP_METHODS.DELETE,
                 handler: deleteDocumentList,
+            },
+            {
+                paths: ['/:id', '/delete/:id', '/destroy/:id'],
+                method: HTTP_METHODS.DELETE,
+                handler: deleteADocument,
             },
         ],
     },
@@ -256,9 +267,14 @@ const routesConfig = {
                 },
             },
             {
-                paths: ['/:id'],
+                paths: [
+                    '/delete/all',
+                    '/delete-all',
+                    '/destroy/all',
+                    '/destroy-all',
+                ],
                 method: HTTP_METHODS.DELETE,
-                handler: deleteADocument,
+                handler: deleteAllDocuments,
             },
             {
                 paths: [
@@ -270,6 +286,11 @@ const routesConfig = {
                 ],
                 method: HTTP_METHODS.DELETE,
                 handler: deleteDocumentList,
+            },
+            {
+                paths: ['/:id'],
+                method: HTTP_METHODS.DELETE,
+                handler: deleteADocument,
             },
         ],
     },

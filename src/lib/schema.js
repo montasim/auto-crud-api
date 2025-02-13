@@ -51,7 +51,7 @@ const dateField = (fieldName = '', isRequired = false) => ({
     ...(isRequired && { required: [true, `${fieldName} is required.`] }),
 });
 
-const booleanField = (fieldName = '', defaultValue = false) => ({
+const booleanField = (defaultValue = false) => ({
     type: Boolean,
     default: defaultValue,
 });

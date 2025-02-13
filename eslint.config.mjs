@@ -37,6 +37,7 @@ export default [
                 process: 'readonly',
                 module: 'readonly',
                 require: 'readonly',
+                console: 'readonly',
 
                 // Adds
                 URL: 'readonly',
@@ -59,7 +60,10 @@ export default [
          */
         rules: {
             // Allows usage of console.warn, console.error, and console.table
-            'no-console': ['warn', { allow: ['error', 'warn', 'table'] }],
+            'no-console': [
+                'warn',
+                { allow: ['info', 'error', 'warn', 'table'] },
+            ],
             'func-names': 'off', // Disables the requirement to name function expressions
             'no-underscore-dangle': 'off', // Allows variable names starting with underscores
             'consistent-return': 'off', // Allows functions with inconsistent return behaviors

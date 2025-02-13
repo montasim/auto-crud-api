@@ -110,6 +110,8 @@ postmanCollection.item.forEach((resourceFolder) => {
                 try {
                     example = JSON.parse(req.body.raw);
                 } catch (error) {
+                    console.error(error);
+
                     example = {};
                 }
                 operation.requestBody = {
@@ -133,4 +135,4 @@ postmanCollection.item.forEach((resourceFolder) => {
 
 // Write the generated Swagger document to a JSON file.
 fs.writeFileSync('swagger.json', JSON.stringify(swaggerDoc, null, 2), 'utf8');
-console.log('Swagger documentation generated as swagger.json');
+console.info('Swagger documentation generated as swagger.json');

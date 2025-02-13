@@ -93,13 +93,6 @@ const toNumber = (schema) =>
         }, z.any())
         .pipe(schema);
 
-// --- 3. Centralized String Splitting and Trimming ---
-const splitAndTrimString = (schema) =>
-    z
-        .string()
-        .transform((val) => val.split(',').map((item) => item.trim()))
-        .pipe(schema);
-
 // Define a Zod schema for all required environment variables using more descriptive names.
 const envSchema = z.object({
     // Application

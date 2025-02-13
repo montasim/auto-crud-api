@@ -39,7 +39,7 @@ class PostmanCollectionGenerator {
             }
             // routesData from the server is not used in this merging example.
             // You might use it to further modify your collection.
-            const routesData = data.data;
+            // const routesData = data.data;
 
             /*
                Merge the default routes (from defaultRoutesRules.js) with the
@@ -172,7 +172,7 @@ class PostmanCollectionGenerator {
                 outputFileName,
                 JSON.stringify(collectionJSON, null, 2)
             );
-            console.log(`Postman collection generated: ${outputFileName}`);
+            console.info(`Postman collection generated: ${outputFileName}`);
         } catch (error) {
             console.error('Error generating Postman collection:', error);
         }

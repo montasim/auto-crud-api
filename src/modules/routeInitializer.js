@@ -30,29 +30,29 @@ const initializeRoutes = (app) => {
                 );
             }
 
-            // Create model, Zod schema, and router once per entity
-            const model = createMongooseModel(entityName, schema);
-            const zodSchema = createZodSchema(
-                entityName,
-                schema,
-                finalRouteConfigs
-            );
-
-            if (!model || !zodSchema) {
-                throw new CriticalError(
-                    `Failed to create model or schema for: ${entityName}`
-                );
-            }
-
-            const router = crudRoutesFactory(
-                entityName,
-                model,
-                zodSchema,
-                finalRouteConfigs
-            );
-
             finalRouteConfigs.forEach(
-                ({ paths: routePaths, method, rules: routeRules }) => {
+                ({ paths: routePaths, method, handler, rules: routeRules }) => {
+                    // Create model, Zod schema, and router once per entity
+                    const model = createMongooseModel(entityName, schema);
+                    const zodSchema = createZodSchema(
+                        entityName,
+                        schema,
+                        handler
+                    );
+
+                    if (!model || !zodSchema) {
+                        throw new CriticalError(
+                            `Failed to create model or schema for: ${entityName}`
+                        );
+                    }
+
+                    const router = crudRoutesFactory(
+                        entityName,
+                        model,
+                        zodSchema,
+                        finalRouteConfigs
+                    );
+
                     // If no paths provided, use default path '/'
                     const finalPaths =
                         Array.isArray(routePaths) && routePaths.length > 0
@@ -86,10 +86,10 @@ const initializeRoutes = (app) => {
                             next();
                         }
                     );
+
+                    app.use(`/api/${entityName}`, router);
                 }
             );
-
-            app.use(`/api/${entityName}`, router);
         }
     );
 };

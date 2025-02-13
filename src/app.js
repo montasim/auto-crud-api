@@ -144,6 +144,7 @@ if (!configuration.app.isProduction) {
 }
 
 // Optional fallthrough error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
     // The error ID is attached to `res.sentry` to be returned
     // and optionally displayed to the user for support.

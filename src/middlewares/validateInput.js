@@ -1,6 +1,6 @@
 import httpStatus from 'http-status-lite';
 
-import httpMethods from '../constants/httpMethods.js';
+import HTTP_METHODS from '../constants/httpMethods.js';
 
 import sendResponse from '../utils/sendResponse.js';
 
@@ -8,16 +8,16 @@ const validateInput = (req, res, next, schemas) => {
     let schema;
 
     switch (req.method) {
-        case httpMethods.POST:
+        case HTTP_METHODS.POST:
             schema = schemas.create;
             break;
-        case httpMethods.PUT:
+        case HTTP_METHODS.PUT:
             schema = schemas.update;
             break;
-        case httpMethods.GET:
+        case HTTP_METHODS.GET:
             schema = schemas.read;
             break;
-        case httpMethods.DELETE:
+        case HTTP_METHODS.DELETE:
             schema = schemas.delete;
             break;
         default:

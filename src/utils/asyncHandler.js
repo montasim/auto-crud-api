@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 import logger from '../lib/logger.js';
 import configuration from '../configuration/configuration.js';
-import environments from '../constants/environments.js';
+import ENVIRONMENTS from '../constants/environments.js';
 
 import sendResponse from './sendResponse.js';
 
@@ -104,7 +104,7 @@ const asyncHandler = (fn) => {
                     error.message ||
                     'An unexpected error occurred on the server.';
                 errorDetails =
-                    configuration.app.environment === environments.PRODUCTION
+                    configuration.app.environment === ENVIRONMENTS.PRODUCTION
                         ? undefined
                         : error.stack;
                 logger.error(`Server Error: ${message}`, errorDetails);

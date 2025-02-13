@@ -1,6 +1,6 @@
 import contentTypes from 'content-types-lite';
 
-import httpMethods from '../constants/httpMethods.js';
+import HTTP_METHODS from '../constants/httpMethods.js';
 
 const defaultRequestContentType = contentTypes.JSON;
 const defaultResponseContentType = contentTypes.JSON;
@@ -10,7 +10,7 @@ const defaultRoutesRules = {
     routes: [
         {
             paths: ['/', '/create', '/add', '/new', '/insert'],
-            method: httpMethods.POST,
+            method: HTTP_METHODS.POST,
             rules: {
                 request: {
                     contentType: defaultRequestContentType,
@@ -40,7 +40,7 @@ const defaultRoutesRules = {
                 '/new-test',
                 '/insert-test',
             ],
-            method: httpMethods.POST,
+            method: HTTP_METHODS.POST,
             rules: {
                 request: {
                     contentType: defaultRequestContentType,
@@ -64,7 +64,7 @@ const defaultRoutesRules = {
                 '/search',
                 '/query',
             ],
-            method: httpMethods.GET,
+            method: HTTP_METHODS.GET,
             rules: {
                 request: {
                     contentType: 'undefined',
@@ -86,7 +86,7 @@ const defaultRoutesRules = {
                 '/search-by-id/:id',
                 '/query-by-id/:id',
             ],
-            method: httpMethods.GET,
+            method: HTTP_METHODS.GET,
             rules: {
                 request: {
                     contentType: 'undefined',
@@ -111,7 +111,7 @@ const defaultRoutesRules = {
                 '/save/:id',
                 '/store/:id',
             ],
-            method: httpMethods.PATCH,
+            method: HTTP_METHODS.PATCH,
             rules: {
                 request: {
                     contentType: defaultRequestContentType,
@@ -138,7 +138,7 @@ const defaultRoutesRules = {
                 '/unedit/:id',
                 '/unupdate/:id',
             ],
-            method: httpMethods.DELETE,
+            method: HTTP_METHODS.DELETE,
             rules: {
                 request: {
                     contentType: 'undefined',
@@ -173,7 +173,7 @@ const defaultRoutesRules = {
                 '/unmodify-list',
                 '/unmodify-by-list',
             ],
-            method: httpMethods.DELETE,
+            method: HTTP_METHODS.DELETE,
             rules: {
                 request: {
                     contentType: 'undefined',
@@ -187,7 +187,7 @@ const defaultRoutesRules = {
         // ✅ Default Route
         {
             paths: ['*'], // Matches all undefined routes
-            method: httpMethods.ALL,
+            method: HTTP_METHODS.ALL,
             rules: {
                 request: {
                     contentType: defaultRequestContentType,

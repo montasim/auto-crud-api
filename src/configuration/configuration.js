@@ -54,8 +54,8 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
 
-import environments from '../constants/environments.js';
-import httpMethods from '../constants/httpMethods.js';
+import ENVIRONMENTS from '../constants/environments.js';
+import HTTP_METHODS from '../constants/httpMethods.js';
 import routesConfig from '../../routes.config.mjs';
 import logger from '../lib/logger.js';
 
@@ -103,9 +103,9 @@ const splitAndTrimString = (schema) =>
 // Define a Zod schema for all required environment variables using more descriptive names.
 const envSchema = z.object({
     // Application
-    NODE_ENV: z.enum([...Object.values(environments)], {
+    NODE_ENV: z.enum([...Object.values(ENVIRONMENTS)], {
         required_error: 'NODE_ENV is required.',
-        invalid_type_error: `NODE_ENV must be one of: ${Object.values(environments).join(', ')}.`,
+        invalid_type_error: `NODE_ENV must be one of: ${Object.values(ENVIRONMENTS).join(', ')}.`,
     }),
 
     // Server
@@ -381,10 +381,10 @@ const envSchema = z.object({
         .refine(
             (methods) =>
                 methods.every((method) =>
-                    Object.values(httpMethods).includes(method)
+                    Object.values(HTTP_METHODS).includes(method)
                 ),
             {
-                message: `CORS_ALLOWED_METHODS must be one of: ${Object.values(httpMethods).join(', ')}`,
+                message: `CORS_ALLOWED_METHODS must be one of: ${Object.values(HTTP_METHODS).join(', ')}`,
             }
         ),
     CORS_ALLOWED_ORIGINS: z

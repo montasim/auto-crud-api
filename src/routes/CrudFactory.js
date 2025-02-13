@@ -6,7 +6,7 @@ import validateInput from '../middlewares/validateInput.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import validateRequestBody from '../middlewares/validateRequestBody.js';
 
-const createCrudRoutes = (modelName, model, zodSchema, routes) => {
+const buildCrudRoutes = (modelName, model, zodSchema, routes) => {
     const router = express.Router();
     const modelNameInSentenceCase = toSentenceCase(modelName);
 
@@ -79,4 +79,4 @@ const createCrudRoutes = (modelName, model, zodSchema, routes) => {
     return router;
 };
 
-export default createCrudRoutes;
+export default buildCrudRoutes;

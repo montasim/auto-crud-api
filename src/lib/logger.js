@@ -2,7 +2,7 @@ import winston from 'winston';
 import 'winston-daily-rotate-file';
 import logSymbols from 'log-symbols';
 
-import environments from "../constants/environments.js";
+import ENVIRONMENTS from '../constants/environments.js';
 
 // Define log directory
 const LOG_DIR = 'logs';
@@ -11,8 +11,8 @@ const LOG_DIR = 'logs';
 const logLevelToSymbol = {
     info: logSymbols.success, // ✅
     warn: logSymbols.warning, // ⚠️
-    error: logSymbols.error,  // ❌
-    debug: logSymbols.info,   // ℹ️
+    error: logSymbols.error, // ❌
+    debug: logSymbols.info, // ℹ️
 };
 
 // Create a custom log format with log symbols
@@ -39,7 +39,7 @@ const createDailyRotateTransport = (filename, level) =>
 const transports = [];
 
 // In development, add both console and file transports
-if (process.env.NODE_ENV !== environments.PRODUCTION) {
+if (process.env.NODE_ENV !== ENVIRONMENTS.PRODUCTION) {
     transports.push(
         new winston.transports.Console({ format: customFormat }),
         createDailyRotateTransport('combined', 'info'),

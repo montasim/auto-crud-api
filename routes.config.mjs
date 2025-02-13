@@ -1,8 +1,8 @@
 import contentTypes from 'content-types-lite';
 import mimeTypes from 'mime-types-lite';
 
-import constants from './src/constants/constants.js';
-import httpMethods from './src/constants/httpMethods.js';
+import APP_CONSTANTS from './src/constants/constants.js';
+import HTTP_METHODS from './src/constants/httpMethods.js';
 
 import createDocument from './src/service/createDocument.js';
 import createDummyDocuments from './src/service/createDummyDocuments.js';
@@ -32,7 +32,7 @@ const routesConfig = {
                 type: String,
                 required: [true, 'Email is required'],
                 unique: true,
-                match: [constants.emailRegex, 'Invalid email format'],
+                match: [APP_CONSTANTS.emailRegex, 'Invalid email format'],
             },
             nid: {
                 type: String,
@@ -82,7 +82,7 @@ const routesConfig = {
         routes: [
             {
                 paths: ['/', '/create', '/new'],
-                method: httpMethods.POST,
+                method: HTTP_METHODS.POST,
                 handler: createDocument,
             },
             {
@@ -97,7 +97,7 @@ const routesConfig = {
                     '/generate-sample',
                     '/generate-sample-data',
                 ],
-                method: httpMethods.POST,
+                method: HTTP_METHODS.POST,
                 handler: createDummyDocuments,
                 dataValidation: false,
                 rules: {
@@ -117,17 +117,17 @@ const routesConfig = {
             },
             {
                 paths: ['/', '/all', '/list', '/read', '/show', '/view'],
-                method: httpMethods.GET,
+                method: HTTP_METHODS.GET,
                 handler: getDocumentsList,
             },
             {
                 paths: ['/:id', '/read/:id', '/show/:id', '/view/:id'],
-                method: httpMethods.GET,
+                method: HTTP_METHODS.GET,
                 handler: getADocument,
             },
             {
                 paths: ['/:id', '/edit/:id', '/update/:id'],
-                method: httpMethods.PATCH,
+                method: HTTP_METHODS.PATCH,
                 handler: updateADocument,
                 rules: {
                     request: {
@@ -158,7 +158,7 @@ const routesConfig = {
             },
             {
                 paths: ['/:id', '/delete/:id', '/destroy/:id'],
-                method: httpMethods.DELETE,
+                method: HTTP_METHODS.DELETE,
                 handler: deleteADocument,
             },
             {
@@ -169,7 +169,7 @@ const routesConfig = {
                     '/destroy-list',
                     '/destroy-by-list',
                 ],
-                method: httpMethods.DELETE,
+                method: HTTP_METHODS.DELETE,
                 handler: deleteDocumentList,
             },
         ],
@@ -191,7 +191,7 @@ const routesConfig = {
                 type: String,
                 required: [true, 'Email is required'],
                 unique: true,
-                match: [constants.emailRegex, 'Invalid email format'],
+                match: [APP_CONSTANTS.emailRegex, 'Invalid email format'],
             },
             isActive: {
                 type: Boolean,
@@ -202,7 +202,7 @@ const routesConfig = {
         routes: [
             {
                 paths: ['/'],
-                method: httpMethods.POST,
+                method: HTTP_METHODS.POST,
                 handler: createDocument,
                 rules: {
                     request: {
@@ -212,7 +212,7 @@ const routesConfig = {
             },
             {
                 paths: ['/', '/all', '/list'],
-                method: httpMethods.GET,
+                method: HTTP_METHODS.GET,
                 handler: getDocumentsList,
                 rules: {
                     request: {},
@@ -231,7 +231,7 @@ const routesConfig = {
             },
             {
                 paths: ['/:id'],
-                method: httpMethods.GET,
+                method: HTTP_METHODS.GET,
                 handler: getADocument,
                 responsePipeline: [
                     { $match: {} },
@@ -247,7 +247,7 @@ const routesConfig = {
             },
             {
                 paths: ['/:id'],
-                method: httpMethods.PATCH,
+                method: HTTP_METHODS.PATCH,
                 handler: updateADocument,
                 rules: {
                     request: {
@@ -257,7 +257,7 @@ const routesConfig = {
             },
             {
                 paths: ['/:id'],
-                method: httpMethods.DELETE,
+                method: HTTP_METHODS.DELETE,
                 handler: deleteADocument,
             },
             {
@@ -268,7 +268,7 @@ const routesConfig = {
                     '/destroy-list',
                     '/destroy-by-list',
                 ],
-                method: httpMethods.DELETE,
+                method: HTTP_METHODS.DELETE,
                 handler: deleteDocumentList,
             },
         ],

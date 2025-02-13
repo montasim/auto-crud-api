@@ -9,6 +9,7 @@
     <img alt="GitHub repo file count" src="https://img.shields.io/github/directory-file-count/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">
     <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">
     <img alt="GitHub license" src="https://img.shields.io/github/license/montasim/auto-crud-api?labelColor=EB008B&color=00B8B5">
+    <img alt="Automated API tests using Postman CLI" src="https://github.com/montasim/auto-crud-api/actions/workflows/postmanAutomatedApiTests.yml/badge.svg">
 </div>
 <!-- repository summary badges end -->
 

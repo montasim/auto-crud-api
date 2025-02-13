@@ -1,35 +1,35 @@
 name: Automated API tests using Postman CLI
 
 on:
-  push:
-    branches:
-      - main
-
+    push:
+        branches:
+            - main
 
 jobs:
-  automated-api-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    automated-api-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20.x'
 
-      - name: Install Newman
-        run: npm install -g newman newman-reporter-htmlextra
+            - name: Install Newman
+              run: npm install -g newman newman-reporter-htmlextra
 
-      - name: Run API Collection
-        run: newman run "${{secrets.collection_url}}" --env-var="baseUrl=${{secrets.baseUrl}}"
+            - name: Run API Collection
+              run: newman run "${{ secrets.collection_url }}" --env-var="baseUrl=${{ secrets.baseUrl }}"
 
-      - name: Generate HTML Report
-        run: newman run "${{secrets.collection_url}}" --env-var="baseUrl=${{secrets.baseUrl}}" -r htmlextra --reporter-htmlextra-export "newman/report.html"
-      - name: see
-        run: ls
+            - name: Generate HTML Report
+              run: newman run "${{ secrets.collection_url }}" --env-var="baseUrl=${{ secrets.baseUrl }}" -r htmlextra --reporter-htmlextra-export "newman/report.html"
 
-      - name: Upload Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: newman-report
-          path: newman/report.html
+            - name: see
+              run: ls
+
+            - name: Upload Report
+              uses: actions/upload-artifact@v4
+              with:
+                  name: newman-report
+                  path: newman/report.html

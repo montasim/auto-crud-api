@@ -189,6 +189,12 @@ const configuration = {
             dsn: process.env.SENTRY_DSN,
             authToken: process.env.SENTRY_AUTH_TOKEN,
         },
+
+        cloudFlareTurnstile: {
+            url: process.env.CLOUDFLARE_TURNSTILE_URL,
+            siteKey: process.env.CLOUDFLARE_TURNSTILE_SITE_KEY,
+            secretKey: process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY,
+        }
     },
 
     routesConfig,

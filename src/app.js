@@ -23,6 +23,7 @@ import swaggerConfiguration from './configuration/swagger.js';
 
 import cspRoutes from './routes/CspRoutes.js';
 import hppRoutes from './routes/HppRoutes.js';
+import verifyTurnstileRoutes from './routes/VerifyTurnstileRoutes.js';
 import cspViolationReport from './service/cspViolationReport.js';
 
 import configuration from './configuration/configuration.js';
@@ -114,6 +115,7 @@ logger.debug('Dynamic route creation completed.');
 logger.debug('Adding violation reporting routes...');
 app.use('/api/report/csp-violation', cspRoutes);
 app.use('/api/report/hpp-violation', hppRoutes);
+app.use('/api/verify-turnstile', verifyTurnstileRoutes);
 logger.debug('Violation reporting routes added.');
 
 app.get('/debug-sentry', (req, res, error) => {

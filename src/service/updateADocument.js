@@ -32,7 +32,11 @@ const updateADocument = async (
                 [field]: req.body[field],
             });
 
-            if (conflictingDoc && conflictingDoc._id.toString() !== docId) {
+            if (
+                conflictingDoc ||
+                (conflictingDoc?.length &&
+                    conflictingDoc._id.toString() !== docId)
+            ) {
                 const msg = `Conflict: ${modelNameInSentenceCase} with ${field} "${req.body[field]}" already exists.`;
                 return sharedResponseTypes.CONFLICT(req, res, contentType, msg);
             }

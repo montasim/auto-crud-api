@@ -131,7 +131,7 @@ logger.debug('Violation reporting routes added.');
 
 // Add this endpoint after dynamic routes have been initialized
 
-app.get(
+app.all(
     '/api/routes-info',
     asyncHandler((req, res) => availableRoutes(req, res))
 );

@@ -28,6 +28,7 @@ const sendResponse = (
         },
         ...(data && { data }),
         ...(errors && { errors }),
+        ...(pagination && { pagination }),
     };
     // Convert response to JSON string
     const jsonResponse = JSON.stringify(responsePayload);

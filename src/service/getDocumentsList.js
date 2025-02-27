@@ -96,10 +96,7 @@ const getDocumentsList = async (
             .skip((parsedPage - 1) * parsedLimit)
             .limit(parsedLimit);
 
-        totalCount = await model
-            .countDocuments(filterQuery)
-            .skip((parsedPage - 1) * parsedLimit)
-            .limit(parsedLimit);
+        totalCount = await model.countDocuments(filterQuery);
     }
 
     const searchFilters = Object.keys(filterQuery).length
@@ -116,7 +113,14 @@ const getDocumentsList = async (
     }
 
     // ✅ Log success message
-    const msg = `Success: ${totalCount} ${modelNameInSentenceCase}${totalCount !== 1 ? 's' : ''} found with filters: ${searchFilters}, sorted by '${sort}', page ${parsedPage}, limit ${parsedLimit}.`;
+    const totalPages = Math.ceil(totalCount / parsedLimit);
+    const msg = `Success: ${totalCount} ${modelNameInSentenceCase}${totalCount !== 1 ? 's' : ''} found with filters: ${searchFilters}, sorted by '${sort}', page ${parsedPage} of ${totalPages}, limit ${parsedLimit}.`;
+
+    totalCount = {
+        total: totalCount,
+        totalPages,
+        currentPage: page,
+    };
 
     return sharedResponseTypes.OK(req, res, contentType, msg, docs, totalCount);
 };

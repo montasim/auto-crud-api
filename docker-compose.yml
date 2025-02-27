@@ -1,0 +1,12 @@
+version: '1.0.0'
+services:
+    your-service:
+        build: .
+        ports:
+            - '5000:5000'
+        env_file:
+            - .env
+        # Or define variables directly:
+        # environment:
+        #   NODE_ENV: production
+        #   DATABASE_URL: mongodb://...

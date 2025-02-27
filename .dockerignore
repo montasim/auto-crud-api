@@ -12,6 +12,7 @@
 # Use: Prevent committing dependencies which can be installed via package managers.
 ####################################################
 node_modules/
+node_modules.git.idea
 .yarn/
 
 ####################################################
@@ -20,6 +21,9 @@ node_modules/
 # Use: Prevent committing build outputs that can be generated from the source code.
 ####################################################
 build/
+logs
+tests
+docs
 
 ####################################################
 # LOG FILES
@@ -33,6 +37,7 @@ logs/
 logs*.json
 # Docker-specific log files
 docker.log
+*.js.map
 
 ####################################################
 # ENVIRONMENT VARIABLE CONFIGURATIONS
@@ -53,3 +58,17 @@ docker.log
 ####################################################
 src/modules/api/documentation/
 Postman_Collection.json
+
+eslint.config.mjs
+generatePostmanCollection.js
+generateSwaggerFromPostman.js
+
+postman/
+.postman/
+README.md
+src/app/src/
+docker-compose.yml
+Dockerfile
+instrument.mjs
+projectStructure.txt
+vercel.json

@@ -39,15 +39,15 @@ const createDailyRotateTransport = (filename, level) =>
 const transports = [];
 
 // In development or if no NODE_ENV is set, add both console and file transports
-if (process.env.NODE_ENV !== ENVIRONMENTS.PRODUCTION || !process.env.NODE_ENV) {
+if (process.env.NODE_ENV !== ENVIRONMENTS.PRODUCTION) {
+    // In production, only add file transports
+    transports.push(new winston.transports.Console({ format: customFormat }));
+} else {
     transports.push(
         new winston.transports.Console({ format: customFormat }),
         createDailyRotateTransport('combined', 'info'),
         createDailyRotateTransport('errors', 'error')
     );
-} else {
-    // In production, only add file transports
-    transports.push(createDailyRotateTransport('combined', 'info'), createDailyRotateTransport('errors', 'error'));
 }
 
 // Create logger instance with the conditional transports

@@ -102,29 +102,28 @@ const envSchema = z.object({
     }),
 
     // Server
-    SERVER_URL: z
-        .string({
-            required_error: 'SERVER_URL is required.',
-        })
-        .refine(
-            async (val) => {
-                val = val.trim();
-
-                if (val.includes('localhost') || val.includes('127.0.0.1')) {
-                    return true;
-                } else {
-                    try {
-                        new URL(val); // Validate URL structure
-                        return await isUrlReachable(val); // Check if the URL exists
-                    } catch {
-                        return false; // Invalid URL format
-                    }
-                }
-            },
-            {
-                message: 'SERVER_URL must be a valid URL and reachable.',
-            }
-        ),
+    SERVER_URL: z.string({
+        required_error: 'SERVER_URL is required.',
+    }),
+    // .refine(
+    //     async (val) => {
+    //         val = val.trim();
+    //
+    //         if (val.includes('localhost') || val.includes('127.0.0.1')) {
+    //             return true;
+    //         } else {
+    //             try {
+    //                 new URL(val); // Validate URL structure
+    //                 return await isUrlReachable(val); // Check if the URL exists
+    //             } catch {
+    //                 return false; // Invalid URL format
+    //             }
+    //         }
+    //     },
+    //     {
+    //         message: 'SERVER_URL must be a valid URL and reachable.',
+    //     }
+    // ),
     SERVER_PORT: toNumber(
         z
             .number({
@@ -382,35 +381,35 @@ const envSchema = z.object({
         ),
     CORS_ALLOWED_ORIGINS: z
         .string()
-        .transform((val) => val.split(',').map((url) => url.trim())) // Split string into an array of URLs
-        .refine(
-            async (origins) => {
-                const validationResults = await Promise.all(
-                    origins.map(async (origin) => {
-                        origin = origin.trim();
-
-                        if (
-                            origin.includes('localhost') ||
-                            origin.includes('127.0.0.1')
-                        ) {
-                            return true;
-                        } else {
-                            try {
-                                new URL(origin); // Validate URL structure
-                                return await isUrlReachable(origin); // Check if the URL exists
-                            } catch {
-                                return false; // Invalid URL format
-                            }
-                        }
-                    })
-                );
-                return validationResults.every((result) => result === true);
-            },
-            {
-                message:
-                    'CORS_ALLOWED_ORIGIN must be a valid URL and reachable.',
-            }
-        ),
+        .transform((val) => val.split(',').map((url) => url.trim())), // Split string into an array of URLs
+    // .refine(
+    //     async (origins) => {
+    //         const validationResults = await Promise.all(
+    //             origins.map(async (origin) => {
+    //                 origin = origin.trim();
+    //
+    //                 if (
+    //                     origin.includes('localhost') ||
+    //                     origin.includes('127.0.0.1')
+    //                 ) {
+    //                     return true;
+    //                 } else {
+    //                     try {
+    //                         new URL(origin); // Validate URL structure
+    //                         return await isUrlReachable(origin); // Check if the URL exists
+    //                     } catch {
+    //                         return false; // Invalid URL format
+    //                     }
+    //                 }
+    //             })
+    //         );
+    //         return validationResults.every((result) => result === true);
+    //     },
+    //     {
+    //         message:
+    //             'CORS_ALLOWED_ORIGIN must be a valid URL and reachable.',
+    //     }
+    // ),
     CORS_ALLOWED_HEADERS: z
         .string()
         .min(1, { message: 'CORS_ALLOWED_HEADERS must be a valid string.' }) // Ensure it's a non-empty string
@@ -590,7 +589,7 @@ const envSchema = z.object({
 let envVars;
 try {
     logger.debug('Validating application environment variables...'); // Info level for start
-    envVars = await envSchema.parseAsync(process.env);
+    envVars = envSchema.parse(process.env);
     logger.debug('Environment variables validation successful.'); // Info level for success
 } catch (error) {
     if (error instanceof z.ZodError) {

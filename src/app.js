@@ -158,5 +158,6 @@ app.all('*', (req, res) => {
 });
 
 logger.info('Server setup completed. Ready to accept requests.');
+console.log(test);
 
 export default app;
